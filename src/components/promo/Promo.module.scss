@@ -1,0 +1,172 @@
+@use '../../common/styles/colors/colors.scss' as colors;
+@import '../../common/styles/typography/typography.scss';
+
+.wrapper {
+    width: 100%;
+    height: 1920px;
+    background-color: colors.$gold;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+        content: '';
+        display: block;
+        width: 1398px;
+        height: 1430px;
+        border-radius: 100%;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='1080' height='1920' viewBox='0 0 1080 1920' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cg filter='url(%23filter0_f_4_50)'%3e%3cellipse cx='540' cy='862' rx='699' ry='715' fill='%23FFE97A' fill-opacity='0.6' /%3e%3c/g%3e%3cdefs%3e%3cfilter id='filter0_f_4_50' x='-659' y='-353' width='2398' height='2430' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3e%3cfeFlood flood-opacity='0' result='BackgroundImageFix' /%3e%3cfeBlend mode='normal' in='SourceGraphic' in2='BackgroundImageFix' result='shape' /%3e%3cfeGaussianBlur stdDeviation='250' result='effect1_foregroundBlur_4_50' /%3e%3c/filter%3e%3c/defs%3e%3c/svg%3e");
+        filter: blur(100px);
+        position: absolute;
+        top: 147px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+    }
+}
+
+.white-cirlce {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    width: 922px;
+    aspect-ratio: 1;
+    background-color: colors.$white;
+    border-radius: 50%;
+    left: 323px;
+    bottom: -517px;
+    z-index: 2;
+    padding: 18.5%;
+    transition: 0.3s;
+
+    &:hover {
+        box-shadow: 0 0 20px 10px lemonchiffon;
+    }
+
+    &::before, &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        background-color: transparent;
+        border-radius: 50%;
+        border: 1px solid colors.$white;
+        width: 100%;
+        aspect-ratio: 1;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation-name: pulse;
+        animation-duration: 5s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+    }
+
+    &::after {
+        animation-delay: 2.5s;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        border-color: colors.$white;
+        transform: translate(-50%, -50%) scale(1); 
+    }
+
+    100% {
+        border-color:transparent;
+        transform: translate(-50%, -50%) scale(2); 
+    }
+}
+
+.h1 {
+    @extend .h1;
+    text-transform: uppercase;
+}
+
+.h4 {
+    @extend .h4;
+    text-align: center;
+}
+
+.heading {
+    position: absolute;
+    top: 499px;
+    left: 20px;
+    z-index: 2;
+    width: 60%;
+}
+
+.bean1 {
+    position: absolute;
+    top: 109px;
+    left: 194px;
+    width: 61px;
+    height: 47px;
+    transform: rotate(-45deg);
+}
+
+.bean2 {
+    position: absolute;
+    top: 109px;
+    left: 460px;
+    width: 123px;
+    height: 162px;
+    transform: rotate(15deg);
+}
+
+.bean3 {
+    position: absolute;
+    top: 20px;
+    right: 224px;
+    width: 118px;
+    height: 89px;
+}
+
+.bean4 {
+    position: absolute;
+    top: 226px;
+    right: 101px;
+    width: 123px;
+    height: 107px;
+    filter: blur(12px);
+}
+
+.bean5 {
+    position: absolute;
+    bottom: 449px;
+    right: 77px;
+    width: 123px;
+    height: 107px;
+    z-index: 3;
+    filter: blur(12px);
+}
+
+.bean6 {
+    position: absolute;
+    bottom: 459px;
+    left: 75px;
+    width: 260px;
+    height: 235px;
+    z-index: 4;
+    transform: rotate(14.6deg);
+    filter: blur(5px);
+}
+
+.cup1 {
+    position: absolute;
+    top: 316px;
+    right: -218px;
+    width: 1092px;
+    height: 1102px;
+    z-index: 3;
+}
+
+.cup2 {
+    position: absolute;
+    top: 1169px;
+    left: -326px;
+    transform: rotate(58deg);
+    width: 925px;
+    height: 933px;
+    z-index: 3;
+    pointer-events: none;
+}
