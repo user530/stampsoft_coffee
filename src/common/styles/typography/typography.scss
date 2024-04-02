@@ -1,0 +1,62 @@
+@import './fonts.scss';
+@use '../colors/colors.scss' as colors;
+
+$fontMain: "Mont-Regular", sans-serif;
+$fontBold: "Mont-Semibold", sans-serif;
+$fontLight: "Mont-Light", sans-serif;
+
+.h1 {
+    font-family: $fontMain;
+    font-size: 207px;
+    font-weight: 600;
+    line-height: 111%;
+    color: colors.$black;
+}
+
+.h2 {
+    font-family: $fontMain;
+    font-size: 83px;
+    font-weight: 600;
+    line-height: 111%;
+    color: colors.$black;
+}
+
+.h3 {
+    font-family: $fontMain;
+    font-size: 72px;
+    font-weight: 600;
+    line-height: 128%;
+    color: colors.$black;
+}
+
+.h4 {
+    font-family: $fontMain;
+    font-size: 64px;
+    font-weight: 600;
+    line-height: 111%;
+    color: colors.$black;
+}
+
+.text {
+    font-family: $fontMain;
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 141%;
+    color: #000;
+}
+
+.text-small {
+    font-family: $fontMain;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 111%;
+    color: colors.$black;
+}
+
+.text-big {
+    font-family: $fontMain;
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 111%;
+    color: colors.$black;
+}
