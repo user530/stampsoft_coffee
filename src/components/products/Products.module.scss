@@ -58,12 +58,20 @@
 
 .categories {
     display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+    overflow-x: auto;
 }
 
 .category-item {
-    height: 500px;
-    width: 300px;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 270px;
+    border-right: 1px solid #DCDCDC;
     background-color: colors.$lightGrey;
+    padding: 10px;
+    padding-bottom: 30px;
+    cursor: pointer;
 
     &.active {
         background-color: colors.$white;
@@ -75,10 +83,13 @@
 
     &:last-child {
         border-top-right-radius: 45px;
+        border-right: none;
     }
 
     p {
         text-align: center;
+        max-width: 256px;
+        margin: 0 auto;
     }
 
     &.active .category-item__img::after {
@@ -96,10 +107,16 @@
 
 .category-item__img {
     position: relative;
-    width: 256px;
+    width: 100%;
     height: 256px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
 
     img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
         position: relative;
         z-index: 2;
     }
