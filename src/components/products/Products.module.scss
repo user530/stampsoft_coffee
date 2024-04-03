@@ -1,4 +1,106 @@
+@use '../../common/styles/colors/colors.scss' as colors;
+@import '../../common/styles/typography/typography.scss';
+
 .wrapper {
     width: 100%;
     height: 1920px;
+    position: relative;
+    overflow: hidden;
+    background-color: currentColor;
+
+    &.theme-1 {
+        color: colors.$coffee;
+
+        .heading-decor {
+            color: colors.$coffeeLight;
+        }
+    }
+
+    &.theme-2 {
+        color: colors.$tea;
+
+        .heading-decor {
+            color: colors.$teaLight;
+        }
+    }
+
+    &.theme-3 {
+        color: colors.$coctail;
+        
+        .heading-decor {
+            color: colors.$coctailLight;
+        }
+    }
+
+    &.theme-4 {
+        color: colors.$juice;
+
+        .heading-decor {
+            color: colors.$juiceLight;
+        }
+    }
+
+}
+
+.heading {
+    position: relative;
+    overflow: hidden;
+    padding: 80px 20px;
+}
+
+.heading-decor {
+    position: absolute;
+    top: -330px;
+    right: 65px;
+    width: 450px;
+    height: 940px;
+}
+
+.categories {
+    display: flex;
+}
+
+.category-item {
+    height: 500px;
+    width: 300px;
+    background-color: colors.$lightGrey;
+
+    &.active {
+        background-color: colors.$white;
+    }
+
+    &:first-child {
+        border-top-left-radius: 45px;
+    }
+
+    &:last-child {
+        border-top-right-radius: 45px;
+    }
+
+    p {
+        text-align: center;
+    }
+
+    &.active .category-item__img::after {
+        content: '';
+        position: absolute;
+        bottom: 13px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 161px;
+        height: 161px;
+        border-radius: 50%;
+        background-color: currentColor;
+    }
+}
+
+.category-item__img {
+    position: relative;
+    width: 256px;
+    height: 256px;
+
+    img {
+        position: relative;
+        z-index: 2;
+    }
 }
