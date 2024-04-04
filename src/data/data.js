@@ -49,7 +49,7 @@ export const productData = [
         products: [
             {
                 id: "2a",
-                name: "Экспрессо",
+                name: "Чай с еще более очень длинным названием топ кек чебурек",
                 img: require("../static/products/coffee/espresso.png"),
                 starterPrice: 79
             },
@@ -122,6 +122,24 @@ export const productData = [
             },
             {
                 id: "3f",
+                name: "Макиато",
+                img: require("../static/products/coffee/makiato.png"),
+                starterPrice: 129
+            },
+            {
+                id: "3g",
+                name: "Латте",
+                img: require("../static/products/coffee/latte.png"),
+                starterPrice: 129
+            },
+            {
+                id: "3h",
+                name: "Капучино",
+                img: require("../static/products/coffee/capuchino.png"),
+                starterPrice: 129
+            },
+            {
+                id: "3i",
                 name: "Макиато",
                 img: require("../static/products/coffee/makiato.png"),
                 starterPrice: 129
