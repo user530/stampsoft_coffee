@@ -1,7 +1,9 @@
 import React from 'react';
 import styles from './Products.module.scss';
-import { useTimeout } from '../../hooks/products/useTimeout';
+import { useTimeout, useSelection, } from '../../hooks/products';
 import sprite from '../../static/sprite.svg';
+import { CategoryItem } from './categoryItem/CategoryItem';
+import { ProductItem } from './productItem/ProductItem';
 
 export const Products = (props) => {
     const { productData, next, prev, setSelectedProduct, } = props;
@@ -14,19 +16,14 @@ export const Products = (props) => {
     const nextCash = () => next('cash');
 
     useTimeout(onTimeout);
-
-    const [selectedCategory, setSelectedCategory] = React.useState(productData[0] || '');    
-    const [categoryProducts, setCategoryProducts] = React.useState(selectedCategory.products || []);
-
-    React.useEffect(
-        () => {
-            setCategoryProducts(selectedCategory.products)
-        },
-        [selectedCategory]
-    )
+    const {
+        selectedCategory, 
+        categoryProducts, 
+        setSelectedCategory
+    } = useSelection(productData[0]);
 
     return (
-        <section className={`${styles['wrapper']} ${styles['theme-'+selectedCategory.id]}`}>
+        <section className={`${styles['wrapper']} ${styles['theme-' + selectedCategory.id]}`}>
             <div className={styles['heading']}>
                 <h2 className={styles['h4']}>Выбор напитка</h2>
                 <svg className={styles['heading-decor']}>
@@ -39,19 +36,15 @@ export const Products = (props) => {
                     productData.map(
                         (category) => {
                             const {id, name, img} = category;
+
                             return (
-                                <div 
-                                key={name + id} 
-                                onClick={() => setSelectedCategory(category)}
-                                className={`${styles['category-item']} ${name === selectedCategory.name ? styles['active'] : ''}
-                                `}
-                                >
-                                    <div className={styles['category-item__img']}>
-                                        <img src={img} alt={name} width={256} height={256}/>
-                                    </div>
-                                    <p className={styles['text-small']}>{name}</p>
-                                    <span></span>
-                                </div>
+                                <CategoryItem 
+                                    key={name + id} 
+                                    name={name} 
+                                    img={img} 
+                                    clickHandler={() => setSelectedCategory(category)} 
+                                    isSelected={name === selectedCategory.name} 
+                                />
                             )
                         }
                     )
@@ -67,13 +60,14 @@ export const Products = (props) => {
                     {
                         categoryProducts.map(
                             ({id, name, img, starterPrice}) => (
-                            <div key={id + name} className={styles['product-card']}>
-                                <div className={styles['product-card__img-wrapper']}>
-                                    <img src={img} alt={name} />
-                                </div>
-                                <h5>{name}</h5>
-                                <p>от <span>{starterPrice}&#8381;</span></p>
-                            </div> )
+                                <ProductItem 
+                                    key={id + name} 
+                                    img={img} 
+                                    name={name} 
+                                    starterPrice={starterPrice} 
+                                    clickHandler={()=>console.log(id)}
+                                />
+                            )
                         )
                     }
                 </div>
