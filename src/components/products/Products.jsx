@@ -18,6 +18,13 @@ export const Products = (props) => {
     const [selectedCategory, setSelectedCategory] = React.useState(productData[0] || '');    
     const [categoryProducts, setCategoryProducts] = React.useState(selectedCategory.products || []);
 
+    React.useEffect(
+        () => {
+            setCategoryProducts(selectedCategory.products)
+        },
+        [selectedCategory]
+    )
+
     return (
         <section className={`${styles['wrapper']} ${styles['theme-'+selectedCategory.id]}`}>
             <div className={styles['heading']}>
@@ -43,11 +50,33 @@ export const Products = (props) => {
                                         <img src={img} alt={name} width={256} height={256}/>
                                     </div>
                                     <p className={styles['text-small']}>{name}</p>
+                                    <span></span>
                                 </div>
                             )
                         }
                     )
                 }
+            </div>
+
+            <div className={styles['products']}>
+                <header className={styles['products__header']}>
+                    <h2 className={styles['h2']}>{selectedCategory.name}</h2>
+                </header>
+
+                <div className={styles['products__content']}>
+                    {
+                        categoryProducts.map(
+                            ({id, name, img, starterPrice}) => (
+                            <div key={id + name} className={styles['product-card']}>
+                                <div className={styles['product-card__img-wrapper']}>
+                                    <img src={img} alt={name} />
+                                </div>
+                                <h5>{name}</h5>
+                                <p>от <span>{starterPrice}&#8381;</span></p>
+                            </div> )
+                        )
+                    }
+                </div>
             </div>
             
             <button onClick={nextCard}>Pay Card</button>
