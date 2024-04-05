@@ -1,0 +1,73 @@
+@use '../../../common/styles/colors/colors.scss' as colors; 
+@import '../../../common/styles/typography/typography.scss';
+@import '../../../common/styles/button/button.scss';
+
+.overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(colors.$overlay, 0.66);
+    z-index: 5;
+    flex-direction: column-reverse;
+    
+    &.active {
+        display: flex;
+    }
+}
+
+.popup {
+    width: 100%;
+    max-height: 95%;
+    border-radius: 45px 45px 0 0;
+    background-color: colors.$white;
+    padding: 0 20px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    & > * {
+        width: 100%;
+    }
+}
+
+.popup__close {
+    width: 333px;
+    height: 159px;
+    background-color: colors.$disabledGrey;
+    border-radius: 0 0 35px 35px;
+    color: colors.$darkGrey;
+    border: 1px solid colors.$darkGrey;
+    margin-bottom: 40px;
+    cursor: pointer;
+
+    svg {
+        width: 60px;
+        height: 60px;
+        color: inherit;
+    }
+
+    &:hover, &:active {
+        color: colors.$overlay;
+        background-color: colors.$lightGrey;
+        border-color: colors.$overlay;
+    }
+}
+
+.popup__next {
+    @extend .button;
+    background-color: colors.$yellow;
+
+    margin-top: 20px;
+
+    p {
+        @extend .text-big;
+    }
+
+    p.accent {
+        font-family: 'Mont-Semibold';
+        font-size: 100px;
+    }
+}
