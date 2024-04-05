@@ -4,16 +4,28 @@ import { useTimeout, useSelection, } from '../../hooks/products';
 import sprite from '../../static/sprite.svg';
 import { CategoryItem } from './categoryItem/CategoryItem';
 import { ProductItem } from './productItem/ProductItem';
+import { Popup } from './popup/Popup';
+import { OptionSize } from './optionSize/OptionSize';
+import { OptionAdvanced } from './optionAdvanced/OptionAdvanced';
 
 export const Products = (props) => {
     const { productData, next, prev, setSelectedProduct, } = props;
 
-    const onTimeout = () => { 
-        setSelectedProduct(null); 
-        // prev();
-    };
-    const nextCard = () => next('card');
-    const nextCash = () => next('cash');
+    const onTimeout = React.useCallback(
+        () => { 
+            setSelectedProduct(null); 
+            // prev();
+        },
+        []
+    );
+
+    const clickHandler = React.useCallback(
+        () => {
+            console.log('Clicked Products!');
+            next()
+        },
+        []
+    );
 
     useTimeout(onTimeout);
     const {
@@ -21,6 +33,15 @@ export const Products = (props) => {
         categoryProducts, 
         setSelectedCategory
     } = useSelection(productData[0]);
+
+    const [selectedItem, setSelectedItem] = React.useState(selectedCategory.products[0] || {name: '', img: ''});
+
+    const [sizePopupOpen, setSizePopupOpen] = React.useState(false);
+    const closeSizePopup = React.useCallback(() => setSizePopupOpen(false), []);
+    
+    const [advancedPopupOpen, setAdvancedPopupOpen] = React.useState(false);
+    const closeAdvancedPopup = React.useCallback(() => setAdvancedPopupOpen(false), []);
+    const openAdvancedPopup = React.useCallback(() => setAdvancedPopupOpen(true), []);
 
     return (
         <section className={`${styles['wrapper']} ${styles['theme-' + selectedCategory.id]}`}>
@@ -59,23 +80,51 @@ export const Products = (props) => {
                 <div className={styles['products__content']}>
                     {
                         categoryProducts.map(
-                            ({id, name, img, starterPrice}) => (
-                                <ProductItem 
-                                    key={id + name} 
-                                    img={img} 
-                                    name={name} 
-                                    starterPrice={starterPrice} 
-                                    clickHandler={()=>console.log(id)}
-                                />
-                            )
+                            (item) => {
+                                const {id, name, img, starterPrice} = item;
+
+                                return (
+                                    <ProductItem 
+                                        key={id + name} 
+                                        img={img} 
+                                        name={name} 
+                                        starterPrice={starterPrice} 
+                                        clickHandler={()=>{
+                                            setSelectedItem(item);
+                                            setSizePopupOpen(true);
+                                        }}
+                                    />
+                                )
+                            }
                         )
                     }
                 </div>
             </div>
             
-            <button onClick={nextCard}>Pay Card</button>
-            <button onClick={nextCash}>Pay Cash</button>
-            <button onClick={() => setSelectedProduct(42)}>Product</button>
+            <Popup 
+            key={1} 
+            price={229} 
+            isOpen={sizePopupOpen} 
+            closeCb={closeSizePopup} 
+            nextCb={clickHandler}
+            >
+                <OptionSize 
+                sizeClickCb={()=>console.log('Size selected!')} 
+                advClickCb={openAdvancedPopup} 
+                productName={selectedItem.name} 
+                productImg={selectedItem.img} />
+            </Popup>
+
+            <Popup 
+            key={2} 
+            price={229} 
+            isOpen={advancedPopupOpen} 
+            closeCb={closeAdvancedPopup} 
+            nextCb={clickHandler}
+            >
+                <OptionAdvanced />
+            </Popup>
+            
         </section>
     )
 }

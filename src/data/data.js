@@ -6,13 +6,13 @@ export const productData = [
         products: [
             {
                 id: "1a",
-                name: "Экспрессо",
+                name: "Эспрессо",
                 img: require("../static/products/coffee/espresso.png"),
                 starterPrice: 79
             },
             {
                 id: "1b",
-                name: "Экспрессо 2х",
+                name: "Эспрессо 2х",
                 img: require("../static/products/coffee/espresso2x.png"),
                 starterPrice: 109
             },
