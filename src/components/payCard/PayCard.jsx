@@ -13,7 +13,7 @@ export const PayCard = (props) => {
         setShowPinpad(true);
     };
 
-    const clickHandler = () => { prev(); };
+    const cancelClickHandler = () => { prev(); };
 
     const keyPressHandler = (e) => {
         if(e.key === '1') 
@@ -25,7 +25,7 @@ export const PayCard = (props) => {
     const [showPinpad, setShowPinpad] = React.useState(false);
     const closePinpad = React.useCallback(() => setShowPinpad(false), []);
 
-    const submitPin = React.useCallback((pincode) => {console.log('Pincode: ' + pincode)});
+    const submitPin = React.useCallback((pincode) => {console.log('Pincode: ' + pincode)}, []);
 
     React.useEffect(
         () => {
@@ -49,7 +49,7 @@ export const PayCard = (props) => {
                 <h3 className={styles['content__title']}>Приложите карту к&nbsp;терминалу</h3>
             </div>
 
-            <button onClick={clickHandler}>Отмена</button>
+            <button onClick={cancelClickHandler}>Отмена</button>
 
             <PinPad isActive={showPinpad} closeCb={closePinpad} sumbitCb={submitPin}/>
         </section>
