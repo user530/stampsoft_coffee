@@ -15,7 +15,8 @@ function App() {
   const toPromo = React.useCallback(() => setAppState('promo'), []);
   const toProducts = React.useCallback(() => setAppState('products'), []);
   const toPayment = React.useCallback(() => setAppState('selectPayment'), []); 
-  // const toPayment = (type) => type === 'card' ? setAppState('payCard') : setAppState('payCash'); 
+  const toPayCash = React.useCallback(() => setAppState('payCash'), []); 
+  const toPayCard = React.useCallback(() => setAppState('payCard'), []); 
 
   React.useEffect(
     () => setProducts(productData),
@@ -26,7 +27,7 @@ function App() {
     <main className={styles['app-wrapper']}>
       { 
         appState === 'promo' 
-        && <Promo headingTxt={'Это твой кофе'} btnText={'Коснитесь экрана'} next={toProducts}/>
+        && <Promo headingTxt={'Это твой кофе'} btnText={'Коснитесь экрана'} next={toProducts} />
       }
 
       {
@@ -36,12 +37,12 @@ function App() {
 
       {
         appState === 'selectPayment'
-        && <SelectPayment />
+        && <SelectPayment prev={toProducts} nextCash={toPayCash} nextCard={toPayCard} />
       }
 
       {
         appState === 'payCard' 
-        && <PayCard />
+        && <PayCard next={toPayment} prev={toPayment} />
       }
 
       {
