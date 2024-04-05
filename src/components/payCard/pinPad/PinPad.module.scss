@@ -1,0 +1,99 @@
+@use '../../../common/styles/colors/colors.scss' as colors;
+@import '../../../common/styles/typography/typography.scss';
+@import '../../../common/styles/button/button.scss';
+
+.wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: colors.$white;
+    padding: 50px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateY(100%);
+    transition: 0.3s;
+
+    & > * {
+        width: 100%;
+    }
+
+    &.active {
+        transform: translateY(0%);
+    }
+}
+
+.button-back {
+    width: 391px;
+    height: 187px;
+    background-color: colors.$disabledGrey;
+    border-radius: 25px;
+    color: colors.$darkGrey;
+    border: 1px solid colors.$darkGrey;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    svg {
+        width: 30px;
+        height: 68px;
+        color: inherit;
+    }
+
+    &:hover, &:active {
+        color: colors.$overlay;
+        background-color: colors.$lightGrey;
+        border-color: colors.$overlay;
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 22px auto 50px;
+    text-align: center;
+    font-family: 'Mont-Light';
+    flex-grow: 1;
+
+    & > * + * {
+        margin-top: 30px;
+    }
+}
+
+.pin-title {
+    @extend .h3;
+}
+
+.pin-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 52px;
+
+    span {
+        width: 124px;
+        flex-shrink: 0;
+        font-size: 200px;
+        line-height: 1;
+        color: #CECECE;
+    }
+}
+
+.pin-keypad {
+    width: 686px;
+    margin-inline: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 34px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.button-submit {
+    @extend .button;
+    @extend .text-big;
+    background-color: colors.$yellow;
+    flex-shrink: 0;
+}
