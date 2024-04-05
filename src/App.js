@@ -5,15 +5,17 @@ import { PayCash } from './components/payCash/PayCash';
 import { Products } from './components/products/Products';
 import { Promo } from './components/promo/Promo';
 import { productData } from './data/data';
+import { SelectPayment } from './components/selectPayment/SelectPayment';
 
 function App() {
   const [appState, setAppState] = React.useState('promo');
   const [products, setProducts] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState(null);
 
-  const toPromo = () => setAppState('promo');
-  const toProducts = () => setAppState('products');
-  const toPayment = (type) => type === 'card' ? setAppState('payCard') : setAppState('payCash'); 
+  const toPromo = React.useCallback(() => setAppState('promo'), []);
+  const toProducts = React.useCallback(() => setAppState('products'), []);
+  const toPayment = React.useCallback(() => setAppState('selectPayment'), []); 
+  // const toPayment = (type) => type === 'card' ? setAppState('payCard') : setAppState('payCash'); 
 
   React.useEffect(
     () => setProducts(productData),
@@ -30,6 +32,11 @@ function App() {
       {
         appState === 'products' 
         && <Products productData={products} next={toPayment} prev={toPromo} setSelectedProduct={setSelectedProduct} />
+      }
+
+      {
+        appState === 'selectPayment'
+        && <SelectPayment />
       }
 
       {
