@@ -1,0 +1,84 @@
+@use '../../../common/styles/colors/colors.scss' as colors; 
+@import '../../../common/styles/typography/typography.scss';
+@import '../../../common/styles/button/button.scss';
+
+.wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.option__img {
+    width: 539px;
+    height: 539px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+.option__name {
+    @extend .h2;
+    margin-top: 40px;
+    text-align: center;
+}
+
+.option__btns {
+    margin-top: 45px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.option__item {
+    width: 333px;
+    height: 367px;
+    border-radius: 15px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 38px;
+    color: #A0A0A0;
+    background-color: colors.$lightGrey;
+
+    &.active {
+        color: colors.$black;
+        background-color: colors.$yellow;
+    }
+
+    div {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        flex-grow: 1;
+
+        svg {
+            color: inherit;
+        }
+    }
+
+    span {
+        @extend .text;
+        font-size: 42px;
+        height: 90px;
+        line-height: 90px;
+        flex-shrink: 0;
+        color: colors.$black;
+    }
+}
+
+.options-advanced {
+    @extend .button;
+    @extend .text-big;
+
+    margin-top: 22px;
+    border: 1px solid colors.$yellow;
+}
