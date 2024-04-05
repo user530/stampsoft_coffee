@@ -1,0 +1,35 @@
+@use '../../../../common/styles/colors/colors.scss' as colors;
+
+.pin-key {
+    width: 206px;
+    height: 206px;
+    border: 1px solid colors.$darkGrey;
+    border-radius: 25px;
+    text-align: center;
+    font-size: 128px;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+        height: 70px;
+        color: inherit;
+    }
+
+    &:hover {
+        background-color: colors.$lightGrey;
+    } 
+    
+    &:active {
+        background-color: colors.$yellow;
+    }
+
+    &:disabled {
+        color: #B1B1B1;
+
+        &:hover, &:active {
+            background-color: transparent;
+        }
+    }
+}
