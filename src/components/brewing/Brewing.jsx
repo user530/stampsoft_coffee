@@ -5,7 +5,7 @@ export const Brewing = (props) => {
     const { nextCb } = props;
     
     // Change to some fetch function, to retrieve duration based on the product
-    const brewingDuration = (() => 137)();
+    const brewingDuration = (() => 30)();
     const [duration, setDuration] = React.useState(brewingDuration);
     const [status, setStatus] = React.useState('Приготовление напитка')
     
@@ -34,7 +34,7 @@ export const Brewing = (props) => {
 
     React.useEffect(
         () => {
-            if(duration === 0) nextCb();
+            if(duration === 0 && nextCb) nextCb();
         },
         [duration, nextCb]
     )
@@ -62,15 +62,23 @@ export const Brewing = (props) => {
         },
         []
     )
-    
+
     return (
         <section className={styles['wrapper']}>
 
-            <div className={styles['circle']} 
-            style={{'--timerDuration': `${brewingDuration}s`}}
-            >
-                <span className={styles['timer']}>{minutes}:{seconds}</span>
-                <span className={styles['status']}>{status}</span>
+            <div className={styles['progress-group']} style={{'--timerDuration': `${brewingDuration}s`}}>
+                <svg className={styles['progress__circle']} width={900} height={900} viewBox='0 0 900 900'>
+                    <circle className={styles['circle__bg']} r={438} cx={900/2} cy={900/2} ></circle>
+                    <circle className={styles['circle__fg']} r={438} cx={900/2} cy={900/2} 
+                    ></circle>
+                </svg>
+
+                <div className={styles['progress__dot']}></div>
+
+                <div className={styles['progress__display']}>
+                    <span className={styles['timer']}>{minutes}:{seconds}</span>
+                    <span className={styles['status']}>{status}</span>
+                </div>
             </div>
 
         </section>

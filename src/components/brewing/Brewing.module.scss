@@ -9,62 +9,80 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
-$size: 875px;
+$outerSize: 900px;
+$circleSize: 876px;
+$circleThickness: 5px;
+$dotSize: 47px;
 $bg: #EAEAEA;
 $fg: colors.$yellow;
-$dotR: 24px;
 
-@property --progress {
-  syntax: '<number>';
-  inherits: false;
-  initial-value: 0;
-}
-
-@property --timerDuration {
-    syntax: '<time>';
-    inherits: true;
-    initial-value: 0s;
-}
-
-.circle {
+.progress-group {
     position: relative;
-    width: $size;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    box-shadow: 0 4px 4px 0 rgba(255, 214, 0, 0.25);
+    animation: growProgressBar var(--timerDuration) linear forwards;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    animation: growProgressBar var(--timerDuration) linear forwards;
-    background: radial-gradient(closest-side, white 99%, transparent 0 99.9%, white 0), conic-gradient($fg calc(var(--progress) * 1%), $bg 0);
-    color: $fg;
 
     span {
         font-family: 'Mont-Light';
         display: block;
         text-align: center;
     }
+}
+
+svg.progress__circle {
+    --circumference: calc(#{$circleSize} * 3.14);
+    width: $outerSize;
+    height: $outerSize;
+    transform: rotate(-90deg);
+    
+    circle.circle__bg {
+        fill: transparent;
+        stroke: $bg;
+        stroke-width: $circleThickness;
+    }
+    
+    circle.circle__fg {
+        fill: transparent;
+        stroke: $fg;
+        stroke-width: $circleThickness;
+        stroke-dasharray: var(--circumference);
+        stroke-dashoffset: calc(var(--circumference) * ((100 - var(--progress)) / 100));
+        transform-origin: center;
+        transform: scaleY(-1);
+    }
+}
+
+.progress__dot {
+    width: $circleSize;
+    height: $circleSize;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate( calc(var(--progress) * -3.6deg));
 
     &::after {
         content: '';
+        width: $dotSize;
+        height: $dotSize;
+        border-radius: 50%;
+        background-color: colors.$yellow;
         position: absolute;
-        height: calc($size / 2 + $dotR);
-        width: calc(10 / 100 * $size + 20px);
-        top: calc($dotR * -1);
+        top: 0;
         left: 50%;
-        transform: translateX(-50%) rotate(calc(var(--progress) / 100 * 360deg));
-        transform-origin: 50% 100%;
-        animation: growProgressBar var(--timerDuration) linear forwards;
-        z-index: 1;
-        background-image: radial-gradient($fg 50%, transparent 50% 100%);
-        background-repeat: no-repeat;
-        background-position: 50% 0;
-        background-size: calc($dotR * 2) calc($dotR * 2);
+        transform: translate(-50%, calc(-50% + $circleThickness / 2));
     }
+}
+
+.progress__display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .timer {
@@ -79,6 +97,18 @@ $dotR: 24px;
     font-size: 40px;
     line-height: 141%;
     color: #a7a7a7;
+}
+
+@property --progress {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --timerDuration {
+    syntax: '<time>';
+    inherits: true;
+    initial-value: 0s;
 }
 
 @keyframes growProgressBar {
