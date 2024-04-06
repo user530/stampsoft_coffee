@@ -1,0 +1,35 @@
+@use '../../common/styles/colors/colors.scss' as colors;
+@import '../../common/styles/typography/typography.scss';
+
+.content {
+    --color: colors.$yellow;
+}
+
+.content__img {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    & > * {
+        width: 100%;
+    }
+
+    svg {
+        width: 217px;
+        height: 308px;
+        position: relative;
+    }
+}
+
+.content__title {
+    margin-top: 60px;
+    @extend .h3;
+    font-size: 96px;
+}
+
+.content__subtitle {
+    @extend .text-big;
+    line-height: 128%;
+    text-align: center;
+}
