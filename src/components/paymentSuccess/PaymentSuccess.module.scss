@@ -1,0 +1,33 @@
+@use '../../common/styles/colors/colors.scss' as colors;
+@import '../../common/styles/typography/typography.scss';
+
+.content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: 47px;
+}
+
+.content__image {
+    margin: 0 auto;
+    width: 334px;
+    height: 334px;
+    border: 7px solid colors.$white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+        width: 149px;
+        height: 149px;
+        color: colors.$white;
+    }
+}
+
+.content__title {
+    @extend .h3;
+    color: colors.$white;
+    text-align: center;
+}
