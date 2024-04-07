@@ -1,11 +1,15 @@
 import React from 'react';
 import styles from './PayCash.module.scss';
 import { FaRegMoneyBillAlt } from "react-icons/fa";
+import { useAppContext } from '../../hooks/context/AppContext';
 
 export const PayCash = (props) => {
     const { next, prev } = props;
     const btnFillRef = React.useRef(null);
-
+    
+    const {state, dispatch} = useAppContext();
+    console.log(state);
+    
     const sumRequired = 250;
     const [sumInputed, setSumInputed] = React.useState(0);
     
@@ -13,17 +17,43 @@ export const PayCash = (props) => {
     const cancelClickHandler = () => { prev(); };
 
     const keyPressHandler = (e) => {
-        if(e.key === '1') 
-            setSumInputed(prev => prev < sumRequired ? prev + 10 : prev);
+        if(e.key === '1')
+            dispatch({type: 'EMIT_CASH_IN', payload: {amount: 10}})
         else if(e.key === '2')
-            setSumInputed(prev => prev < sumRequired ? prev + 50 : prev);
+            dispatch({type: 'EMIT_CASH_IN', payload: {amount: 50}})
         else if(e.key === '3')
-            setSumInputed(prev => prev < sumRequired ? prev + 100 : prev);
+            dispatch({type: 'EMIT_CASH_IN', payload: {amount: 100}})
+    };
+
+    const handleCashin = (amount) => {
+        console.log(`Handle cash in fired:`);
+        console.log(`Current stash: ${sumInputed}`);
+        console.log(`Sum required: ${sumRequired}`);
+        console.log(`Amount inserted: ${amount}`);
+        setSumInputed(prev => prev + amount);
+        // setSumInputed(prev => prev < sumRequired ? prev + amount : prev);
     }
 
     React.useEffect(
         () => {
+            console.log(sumInputed);
+            if(sumInputed >= sumRequired) {
+                dispatch(
+                    {
+                        type: 'STOP_CASH_IN', 
+                        payload: {
+                            cb: () => {console.log('Cash In Stoped!');}
+                        }
+                    });
+            }
+        },
+        [sumInputed]
+    )
+
+    React.useEffect(
+        () => {
             window.addEventListener('keydown', keyPressHandler);
+            dispatch({type: 'START_CASH_IN', payload: {cb: handleCashin}})
 
             return () => window.removeEventListener('keydown', keyPressHandler);
         },
