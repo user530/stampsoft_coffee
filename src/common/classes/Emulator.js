@@ -1,4 +1,4 @@
-class Emulator {
+export class Emulator {
     #status;
     #callbacks;
     #events;
