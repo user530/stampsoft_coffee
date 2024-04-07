@@ -25,7 +25,7 @@ export const PayCard = (props) => {
     const [showPinpad, setShowPinpad] = React.useState(false);
     const closePinpad = React.useCallback(() => setShowPinpad(false), []);
 
-    const submitPin = React.useCallback((pincode) => {console.log('Pincode: ' + pincode)}, []);
+    const submitPin = React.useCallback((pincode) => {console.log('Pincode: ' + pincode); next();}, []);
 
     React.useEffect(
         () => {

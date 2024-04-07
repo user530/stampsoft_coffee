@@ -13,7 +13,7 @@ import { PaymentSuccess } from './components/paymentSuccess/PaymentSuccess';
 import { NoProduct } from './components/noProduct/NoProduct';
 
 function App() {
-  const [appState, setAppState] = React.useState('test');
+  const [appState, setAppState] = React.useState('promo');
   const [products, setProducts] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState(null);
 
@@ -23,6 +23,8 @@ function App() {
   const toPayCash = React.useCallback(() => setAppState('payCash'), []);
   const toPayCard = React.useCallback(() => setAppState('payCard'), []);
   const toBrewing = React.useCallback(() => setAppState('brewing'), []);
+  const toSuccess = React.useCallback(() => setAppState('success'), []);
+  const toFail = React.useCallback(() => setAppState('fail'), []);
 
   React.useEffect(
     () => setProducts(productData),
@@ -48,17 +50,17 @@ function App() {
 
       {
         appState === 'payCard' 
-        && <PayCard next={toBrewing} prev={toPayment} />
+        && <PayCard next={ Math.random() > 0.5 ? toSuccess : toFail } prev={toPayment} />
       }
 
       {
         appState === 'payCash' 
-        && <PayCash next={toBrewing} prev={toPayment} />
+        && <PayCash next={ Math.random() > 0.5 ? toSuccess : toFail } prev={toPayment} />
       }
 
       {
         appState === 'fail'
-        && <PaymentFail cancelCb={toProducts} retryCb={() => console.log('Pay again!')}/>
+        && <PaymentFail cancelCb={toProducts} retryCb={ toPayment }/>
       }
 
       {
@@ -77,8 +79,8 @@ function App() {
       }
 
       {
-        appState === 'test'
-        && <NoProduct backCb={toProducts} />
+        appState === 'noproduct'
+        && <NoProduct backCb={() => {console.log('Product ready!'); setAppState('promo');}} delay={5000} />
       }
 
     </main>

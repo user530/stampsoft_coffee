@@ -9,6 +9,7 @@ export const PayCash = (props) => {
     const sumRequired = 250;
     const [sumInputed, setSumInputed] = React.useState(0);
     
+    const submitClickHandler = () => { next(); };
     const cancelClickHandler = () => { prev(); };
 
     const keyPressHandler = (e) => {
@@ -40,7 +41,7 @@ export const PayCash = (props) => {
             </div>
 
             <div className={styles['control-buttons']}>
-                <button onClick={cancelClickHandler} className={styles['filled']}>
+                <button onClick={submitClickHandler} className={styles['filled']} disabled={sumInputed < sumRequired}>
                     <span 
                     ref={ btnFillRef } 
                     className={styles['filled__overlay']} 
