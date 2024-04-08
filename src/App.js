@@ -55,7 +55,7 @@ function App() {
 
       {
         appState === 'payCash' 
-        && <PayCash next={ Math.random() > 0.5 ? toSuccess : toFail } prev={toPayment} />
+        && <PayCash next={ (result) => result ? () => toSuccess() : () => toFail() } prev={toPayment} />
       }
 
       {

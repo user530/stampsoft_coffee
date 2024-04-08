@@ -8,7 +8,8 @@ export const PayCash = (props) => {
     const btnFillRef = React.useRef(null);
     
     const {state, dispatch} = useAppContext();
-    console.log(state);
+    console.log(state.emulator);
+    const { CashPurchase, StartCashin, EmitCashin, StopCashin, EmitConfirm, EmitCancel } = state.emulator;
     
     const sumRequired = 250;
     const [sumInputed, setSumInputed] = React.useState(0);
@@ -18,11 +19,11 @@ export const PayCash = (props) => {
 
     const keyPressHandler = (e) => {
         if(e.key === '1')
-            dispatch({type: 'EMIT_CASH_IN', payload: {amount: 10}})
+            EmitCashin(10)
         else if(e.key === '2')
-            dispatch({type: 'EMIT_CASH_IN', payload: {amount: 50}})
+            EmitCashin(50)
         else if(e.key === '3')
-            dispatch({type: 'EMIT_CASH_IN', payload: {amount: 100}})
+            EmitCashin(100)
     };
 
     const handleCashin = (amount) => {
@@ -38,13 +39,7 @@ export const PayCash = (props) => {
         () => {
             console.log(sumInputed);
             if(sumInputed >= sumRequired) {
-                dispatch(
-                    {
-                        type: 'STOP_CASH_IN', 
-                        payload: {
-                            cb: () => {console.log('Cash In Stoped!');}
-                        }
-                    });
+                StopCashin(() => {console.log('Cash In Stoped!')});
             }
         },
         [sumInputed]
@@ -53,7 +48,24 @@ export const PayCash = (props) => {
     React.useEffect(
         () => {
             window.addEventListener('keydown', keyPressHandler);
-            dispatch({type: 'START_CASH_IN', payload: {cb: handleCashin}})
+            // StartCashin(handleCashin)
+            CashPurchase(
+                handleCashin, 
+                (result) => {
+                    if(result) {
+                        // Clear sumInputed
+                        // Add to history
+                        console.log('CONFIRM RESULT: ', result);
+                        setSumInputed(0);
+                        next(result)();
+                    }
+                    else console.error('Failed to confirm cash operation');
+                }, 
+                (reason) => {
+                    console.error(reason);
+                    prev();
+                }
+            )
 
             return () => window.removeEventListener('keydown', keyPressHandler);
         },
@@ -71,7 +83,12 @@ export const PayCash = (props) => {
             </div>
 
             <div className={styles['control-buttons']}>
-                <button onClick={submitClickHandler} className={styles['filled']} disabled={sumInputed < sumRequired}>
+                <button 
+                onClick={
+                    () => EmitConfirm({type: 'cash', change: sumInputed - sumRequired })
+                } 
+                // onClick={submitClickHandler} 
+                className={styles['filled']} disabled={sumInputed < sumRequired}>
                     <span 
                     ref={ btnFillRef } 
                     className={styles['filled__overlay']} 
@@ -79,10 +96,13 @@ export const PayCash = (props) => {
 
                     ></span>
                     <span>
-                        Оплатить
+                        { sumInputed < sumRequired ? `Внесено: ${sumInputed} / ${sumRequired}` : 'Оплатить'}
                     </span>
                 </button>
-                <button onClick={cancelClickHandler}>Отмена</button>
+                <button 
+                onClick={ () => EmitCancel()}
+                // onClick={cancelClickHandler}
+                >Отмена</button>
             </div>
         </section>
     )

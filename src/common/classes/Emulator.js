@@ -1,13 +1,8 @@
 export class Emulator {
-    #status;
-    #callbacks;
-    #events;
-
-    constructor() {
-        this.#status = 'READY';
-        this.#callbacks = {};
-        this.#events = ['cashIn'];
-    }
+    #status = 'READY';
+    #callbacks = {};
+    #events = ['cashIn', 'confirmPayment', 'cancelPayment'];
+    #stash = 0;
 
     get status() {
         return this.#status;
@@ -17,12 +12,32 @@ export class Emulator {
         this.#status = newStatus;
     }
 
+    get stash() {
+        return this.#stash;
+    }
+
+    set stash(newAmount) {
+        this.#stash = newAmount;
+    }
+
+    incrementStash = (addToStash) => {
+        this.#stash += addToStash;
+    }
+
+    clearStash = () => {
+        this.#stash = 0;
+    }
+
     setStatusReady = () => {
         this.#status = 'READY';
     }
 
-    setStatusCashIn = () => {
-        this.#status = 'LISTENING_CASH';
+    setStatusWaitingCash = () => {
+        this.#status = 'WAITING_CASH';
+    }
+
+    setStatusWaitingConfirm = () => {
+        this.#status = 'WAITING_CONFIRM';
     }
 
     isValidEvent = (eventName) => {
@@ -66,7 +81,7 @@ export class Emulator {
         // Register callback
         this.registerCallback('cashIn', (cashinEvent) => cb(cashinEvent.amount))
         // Update the status
-        this.setStatusCashIn();
+        this.setStatusWaitingCash();
     }
 
     /**
@@ -75,7 +90,7 @@ export class Emulator {
      */
     EmitCashin = (cashAmount) => {
         // Skip, if emulator currently not listening to the 'cashIn' events
-        if(this.#status !== 'LISTENING_CASH') 
+        if(this.#status !== 'WAITING_CASH')
             return;
 
         // Check argument 
@@ -84,6 +99,9 @@ export class Emulator {
 
         // Placeholder cashin event, later change to a creator method
         const cashinEvent = { name: 'cashIn', amount: cashAmount };
+
+        // Add to stash
+        this.incrementStash(cashAmount);
 
         // Fire a callback for the event
         this.#callbacks[cashinEvent.name](cashinEvent);
@@ -95,11 +113,103 @@ export class Emulator {
      */
     StopCashin = (cb) => {
         // Skip, if emulator currently not listening to the 'cashIn' events
-        if(this.#status !== 'LISTENING_CASH') return;
+        if(this.#status !== 'WAITING_CASH') return;
 
         // Clear events and fire callback
         this.clearEventCallbacks('cashIn');
-        this.setStatusReady();
+        this.setStatusWaitingConfirm();
         cb();
+    }
+
+    CashPurchase = (cashInCb, confirmCb, cancelCb) => {
+        /* Skip, if emulator is already busy with some other task  */ 
+        if(this.#status !== 'READY') 
+            return;
+        
+        this.registerCallback('confirmPayment', (result) => confirmCb(result));
+        this.registerCallback('cancelPayment', (reason) => cancelCb(reason));
+
+        this.StartCashin(cashInCb);
+    }
+
+    EmitConfirm = (confirmData) => {
+        console.log('Emit confirm fired');
+
+        // Skip, if emulator currently not listening to the 'confirm' events
+        if(this.#status !== 'WAITING_CONFIRM')
+            return;
+
+        const { type, change } = confirmData;
+
+        console.log(confirmData);
+        // If confirming cash payment -> return change
+        if( type === 'cash' && change){
+            console.log('Cash payment');
+
+            // Return the user change (if any) and clear the stash
+            if(change) this.returnChange(change);
+            this.clearStash();
+
+            // Return to idle status
+            this.setStatusReady();
+
+            console.log(this.#status);
+
+            // Fire a callback for the event, there is no 'failed' confirm so pass true
+            this.#callbacks['confirmPayment'](true);
+            
+            // Clear payment callbacks
+            this.clearEventCallbacks('confirmPayment');
+            this.clearEventCallbacks('cancelPayment');
+        }
+
+        
+    }
+
+    EmitCancel = () => {
+        console.log('Emit cancel fired!');
+        // Skip, if emulator currently not listening to the 'cashIn' events
+        if(this.#status !== 'WAITING_CONFIRM' && this.#status !== 'WAITING_CASH')
+            return
+
+        console.log('Correct status');
+
+        // Return to idle status
+        this.setStatusReady();
+
+        console.log('Reset status');
+        console.log(this.#status);
+
+        // Fire a callback for the event
+        this.#callbacks['cancelPayment']('Oперация отменена пользователем!');
+        
+        // Clear payment callbacks
+        this.clearEventCallbacks('confirmPayment')
+        this.clearEventCallbacks('cancelPayment')
+        // Clear payment listeners
+        if(this.#callbacks['cashIn']) this.clearEventCallbacks('cashIn');
+        
+        // Refund and clear the stash if user entered some money
+        if(this.#stash) {
+            this.returnChange(this.#stash);
+            this.clearStash();
+        }
+        console.log(this);
+    }
+
+    /**
+     * Placeholder emulating the return of change
+     * @param {Number} amount Amount of money to return 
+     */
+    returnChange = (amount) => {
+        // Placeholder logic
+        console.log(`Выдал ${amount}р сдачи...`);
+    }
+
+    confirmPinCode = (pincode, emulateConfirm = true) => {
+        // Placeholder logic
+        console.log(`Пинкод: ${pincode} ${emulateConfirm ? '' : 'не'}был подтвержден!`);
+
+        return emulateConfirm;
     }
 }
