@@ -3,7 +3,7 @@ import styles from './PaymentFail.module.scss';
 import { RxCross1 } from "react-icons/rx";
 
 export const PaymentFail = (props) => {
-    const { cancelCb, retryCb } = props;
+    const { cancelCb, retryCb, failReason } = props;
 
     const retryClickHandler = () => {
         console.log('Clicked retry!');
@@ -21,7 +21,7 @@ export const PaymentFail = (props) => {
                 <div className={styles['content__image']}>
                     <RxCross1/>
                 </div>
-                <div className={styles['content__title']}>Оплата не прошла</div>
+                <div className={styles['content__title']}>{failReason || 'Оплата не прошла'}</div>
             </div>
 
             <div className={styles['controls']}>
