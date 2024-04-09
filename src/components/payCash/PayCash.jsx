@@ -53,13 +53,16 @@ export const PayCash = (props) => {
                 handleCashin, 
                 (result) => {
                     if(result) {
-                        // Clear sumInputed
-                        // Add to history
                         console.log('CONFIRM RESULT: ', result);
+                        // Clear sumInputed
                         setSumInputed(0);
+                        // Add to history?
                         next(result)();
                     }
-                    else console.error('Failed to confirm cash operation');
+                    else {
+                        console.error('Failed to confirm cash operation');
+                        // Is this scenario even possible?
+                    }
                 }, 
                 (reason) => {
                     console.error(reason);

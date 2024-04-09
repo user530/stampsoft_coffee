@@ -16,6 +16,7 @@ function App() {
   const [appState, setAppState] = React.useState('promo');
   const [products, setProducts] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState(null);
+  const [failureReason, setFailureReason] = React.useState('');
 
   const toPromo = React.useCallback(() => setAppState('promo'), []);
   const toProducts = React.useCallback(() => setAppState('products'), []);
@@ -24,7 +25,7 @@ function App() {
   const toPayCard = React.useCallback(() => setAppState('payCard'), []);
   const toBrewing = React.useCallback(() => setAppState('brewing'), []);
   const toSuccess = React.useCallback(() => setAppState('success'), []);
-  const toFail = React.useCallback(() => setAppState('fail'), []);
+  const toFail = React.useCallback((reason) => {setAppState('fail'); setFailureReason(reason);}, []);
 
   React.useEffect(
     () => setProducts(productData),
@@ -50,17 +51,17 @@ function App() {
 
       {
         appState === 'payCard' 
-        && <PayCard next={ Math.random() > 0.5 ? toSuccess : toFail } prev={toPayment} />
+        && <PayCard next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} />
       }
 
       {
         appState === 'payCash' 
-        && <PayCash next={ (result) => result ? () => toSuccess() : () => toFail() } prev={toPayment} />
+        && <PayCash next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} />
       }
 
       {
         appState === 'fail'
-        && <PaymentFail cancelCb={toProducts} retryCb={ toPayment }/>
+        && <PaymentFail cancelCb={ () => {toProducts(); setFailureReason('');} } retryCb={ toPayCard } failReason={ failureReason }/>
       }
 
       {
