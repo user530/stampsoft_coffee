@@ -61,6 +61,10 @@ export class Emulator {
         this.#status = 'PROCESSING_CARD';
     }
 
+    setStatusProcessing = () => {
+        this.#status = 'PROCESSING';
+    }
+
     clearInterupt = () => {
         this.#interupted = false;
     }
@@ -169,46 +173,87 @@ export class Emulator {
         this.StartCashin(cashInCb);
     }
 
-    EmitConfirm = (confirmData) => {
+    EmitConfirm = async (confirmData) => {
         console.log('Emit confirm fired');
 
         // Skip, if emulator currently not listening to the 'confirm' events
         if(this.#status !== 'WAITING_CONFIRM')
             return;
 
-        const { type, change } = confirmData;
+        const { type, change, pincode, interupt } = confirmData;
 
         console.log(confirmData);
+
+        // Set status to prevent other interactions
+        this.setStatusProcessing();
+
         // If confirming cash payment -> return change
-        if( type === 'cash' && change){
+        if( type === 'cash'){
             console.log('Cash payment');
 
             // Return the user change (if any) and clear the stash
             if(change) this.returnChange(change);
             this.clearStash();
 
-            // Return to idle status
-            this.setStatusReady();
-
             console.log(this.#status);
 
             // Fire a callback for the event, there is no 'failed' confirm so pass true
             this.#callbacks['confirmPayment'](true);
-            
-            // Clear payment callbacks
-            this.clearEventCallbacks('confirmPayment');
-            this.clearEventCallbacks('cancelPayment');
         }
 
-        
+        if(type === 'card') {
+            // Set status
+            this.#callbacks['paymentStatusUpdated']('Ожидаем подтверждение');
+            
+            // Handle card confirmation process
+            try {
+                // Handle 'interupted' confirm (In future add some logic to inform the bank)
+                if(interupt)
+                    throw new Error('Oперация подтверждения отменена пользователем!');
+                
+                // Emulate pin code check
+                const pinCheck = await this.emulateCheck(pincode > 5000);
+
+                // Wrong pin code
+                if(!pinCheck)
+                     throw new Error('Неверный PIN код!');
+                
+                // Successful confirm
+                this.#callbacks['confirmPayment'](true);
+
+            } catch (error) {
+                this.#callbacks['confirmPayment'](false, error.message || 'Непредвиденная ошибка!');
+            } finally {
+                // Clean up logic
+                this.ejectCard();
+                this.resetCharged();
+                this.clearInterupt();
+            }
+        }
+
+        // Return to idle status
+        this.setStatusReady();
+
+        // Clear payment callbacks
+        this.clearEventCallbacks('confirmPayment');
+        this.clearEventCallbacks('cancelPayment');
     }
 
     EmitCancel = () => {
         console.log('Emit cancel fired!');
         // Skip, if emulator currently not listening to the 'cashIn' events
-        if(this.#status !== 'WAITING_CONFIRM' && this.#status !== 'WAITING_CASH')
+        if(
+            this.#status !== 'WAITING_CONFIRM' 
+            && this.#status !== 'WAITING_CASH' 
+            && this.#status !== 'WAITING_CARD'
+            && this.#status !== 'PROCESSING_CARD'
+        )
             return
 
+        // If currently processing the card -> raise interruption flag and leave at that for gracefull cancel
+        if(this.#status === 'PROCESSING_CARD')
+            return this.interuptOperation();
+        
         console.log('Correct status');
 
         // Return to idle status
@@ -223,14 +268,26 @@ export class Emulator {
         // Clear payment callbacks
         this.clearEventCallbacks('confirmPayment')
         this.clearEventCallbacks('cancelPayment')
+
         // Clear payment listeners
         if(this.#callbacks['cashIn']) this.clearEventCallbacks('cashIn');
+        if(this.#callbacks['cardIn']) this.clearEventCallbacks('cardIn');
+        if(this.#callbacks['paymentStatusUpdated']) this.clearEventCallbacks('paymentStatusUpdated');
         
         // Refund and clear the stash if user entered some money
         if(this.#stash) {
             this.returnChange(this.#stash);
             this.clearStash();
         }
+
+        // Eject card if any inserted
+        if(this.#cardInserted) {
+            this.ejectCard();
+        }
+
+        // Clear payment data
+        this.#chargedAmount = 0;
+        
         console.log(this);
     }
 
@@ -248,7 +305,7 @@ export class Emulator {
         // Register callback
         this.registerCallback('cardIn', (success, reason = '') => cb(success, reason));
         this.registerCallback('paymentStatusUpdated', (status) => display_cb(status));
-        this.registerCallback('confirmPayment', (result) => confirmCb(result));
+        this.registerCallback('confirmPayment', (success, result) => confirmCb(success, result));
         this.registerCallback('cancelPayment', (reason) => cancelCb(reason));
     }
 
@@ -286,21 +343,21 @@ export class Emulator {
             this.EmitStatusUpdate('Связь с банком');
 
             // Emulate 2nd check
-            const check2 = await this.emulateCheck(false);
+            const check2 = await this.emulateCheck(true);
             if(!check2) throw new Error('Не удалось связаться с банком!');
             
             this.EmitStatusUpdate('Проверка данных');
 
             // Emulate 3rd check
-            const check3 = await this.emulateCheck(false);
+            const check3 = await this.emulateCheck(true);
             if(!check3) throw new Error('Неверные данные карты!');
 
             // Emulate amount check -> Here we pass amount to the bank to confirm
-            const check4 = await this.emulateCheck(false, this.#chargedAmount);
+            const check4 = await this.emulateCheck(true, this.#chargedAmount);
             if(!check4) throw new Error('Недостаточно средств на карте!');
 
             this.EmitStatusUpdate('Подтвердите транзакцию');
-            
+            console.log(this.#interupted);
             // If interuption flag was raised
             if(this.#interupted) throw new Error('Операция отменена пользователем!');
             
@@ -314,9 +371,10 @@ export class Emulator {
         } catch (error) {
             this.setStatusReady();
             this.ejectCard();
+            this.resetCharged();
             this.clearInterupt();
 
-            return this.#callbacks['cardIn'](false, 'Не удалось обработать карту!');
+            return this.#callbacks['cardIn'](false, error.message || 'Непредвиденная ошибка!');
         }
     }
 
