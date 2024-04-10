@@ -175,14 +175,12 @@ export class Emulator {
 
     EmitConfirm = async (confirmData) => {
         console.log('Emit confirm fired');
-
+    
         // Skip, if emulator currently not listening to the 'confirm' events
         if(this.#status !== 'WAITING_CONFIRM')
             return;
-
+    
         const { type, change, pincode, interupt } = confirmData;
-
-        console.log(confirmData);
 
         // Set status to prevent other interactions
         this.setStatusProcessing();
@@ -207,12 +205,12 @@ export class Emulator {
             
             // Handle card confirmation process
             try {
-                // Handle 'interupted' confirm (In future add some logic to inform the bank)
+                // Handle 'interupt' if confirm (In future add some logic to inform the bank)
                 if(interupt)
                     throw new Error('Oперация подтверждения отменена пользователем!');
                 
                 // Emulate pin code check
-                const pinCheck = await this.emulateCheck(pincode > 5000);
+                const pinCheck = await this.emulateCheck(pincode > 5000, 5000);
 
                 // Wrong pin code
                 if(!pinCheck)
@@ -241,7 +239,8 @@ export class Emulator {
 
     EmitCancel = () => {
         console.log('Emit cancel fired!');
-        // Skip, if emulator currently not listening to the 'cashIn' events
+
+        // Skip, if emulator currently not listening to cancelable events
         if(
             this.#status !== 'WAITING_CONFIRM' 
             && this.#status !== 'WAITING_CASH' 
@@ -310,7 +309,20 @@ export class Emulator {
     }
 
     BankCardCancel = () => {
-        // Clear callbacks, clear interupt flag, clear charged amount, eject the card
+        // Clean up logic
+        this.ejectCard();
+        this.resetCharged();
+        this.clearInterupt();
+
+        // Return to idle status
+        this.setStatusReady();
+
+        // Clear callbacks
+        this.clearEventCallbacks('cashIn');
+        this.clearEventCallbacks('cardIn');
+        this.clearEventCallbacks('paymentStatusUpdated');
+        this.clearEventCallbacks('confirmPayment');
+        this.clearEventCallbacks('cancelPayment');
     }
 
     EmitCardIn = async (cardData) => {
@@ -337,23 +349,23 @@ export class Emulator {
         
         try {
             // Emulate 1st check
-            const check1 = await this.emulateCheck(true);
+            const check1 = await this.emulateCheck(cardData.data1);
             if(!check1) throw new Error('Не удалось обработать карту!');
             
             this.EmitStatusUpdate('Связь с банком');
 
             // Emulate 2nd check
-            const check2 = await this.emulateCheck(true);
+            const check2 = await this.emulateCheck(cardData.data2);
             if(!check2) throw new Error('Не удалось связаться с банком!');
             
             this.EmitStatusUpdate('Проверка данных');
 
             // Emulate 3rd check
-            const check3 = await this.emulateCheck(true);
+            const check3 = await this.emulateCheck(cardData.data3);
             if(!check3) throw new Error('Неверные данные карты!');
 
             // Emulate amount check -> Here we pass amount to the bank to confirm
-            const check4 = await this.emulateCheck(true, this.#chargedAmount);
+            const check4 = await this.emulateCheck(cardData.data4, this.#chargedAmount);
             if(!check4) throw new Error('Недостаточно средств на карте!');
 
             this.EmitStatusUpdate('Подтвердите транзакцию');

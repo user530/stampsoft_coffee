@@ -27,11 +27,15 @@ export const PayCard = (props) => {
 
     const keyPressHandler = (e) => {
         if(e.key === '1') 
-            EmitCardIn({valid: true})
-            // cardInputHandler(true);
+            EmitCardIn({data1: true, data2: true, data3: true, data4: true,})
         else if(e.key === '2')
-            EmitCardIn({valid: false})
-            // cardInputHandler(false);
+            EmitCardIn({data1: false, data2: true, data3: true, data4: false,})
+        else if(e.key === '3')
+            EmitCardIn({data1: true, data2: false, data3: true, data4: false,})
+        else if(e.key === '4')
+            EmitCardIn({data1: true, data2: true, data3: false, data4: false,})
+        else if(e.key === '5')
+            EmitCardIn({data1: true, data2: true, data3: true, data4: false,})
     }
     
     const [statusText, setStatusText] = React.useState('Приложите карту к терминалу');
@@ -39,8 +43,8 @@ export const PayCard = (props) => {
 
     const closePinpad = React.useCallback(
         () => {
-            setShowPinpad(false);
             EmitConfirm({type: 'card', interupt: true});
+            setShowPinpad(false);
         }, []);
 
     const submitPin = React.useCallback(
