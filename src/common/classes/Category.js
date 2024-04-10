@@ -17,4 +17,8 @@ export class Category {
         this.img = categoryImg;
         this.products = categoryProducts;
     }
+
+    getProductById = (productId) => {
+        return this.products.find(productObj => productObj.id === productId);
+    }
 }
