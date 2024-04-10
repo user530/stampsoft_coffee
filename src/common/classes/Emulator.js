@@ -45,6 +45,14 @@ export class Emulator {
         this.#status = 'READY';
     }
 
+    setStatusWaitingProductSelect = () => {
+        this.#status = 'WAITING_PRODUCT_SELECT';
+    }
+
+    setStatusWaitingProductVend = () => {
+        this.#status = 'WAITING_PRODUCT_VEND';
+    }
+
     setStatusWaitingCash = () => {
         this.#status = 'WAITING_CASH';
     }
@@ -398,6 +406,23 @@ export class Emulator {
 
         this.#callbacks['paymentStatusUpdated'](newStatus);
     }
+
+    Vending = (cb) => {
+        /* Skip, if emulator is already busy with some other task  */ 
+        if(this.#status !== 'READY') 
+            return;
+        
+        this.registerCallback('selectProduct', (product_idx) => this.setSelection(product_idx));
+        this.registerCallback('vendProduct', (product_idx) => cb(product_idx));
+
+        // this.Se
+    // Выдача кофе с индексом product_idx (индексы в порядке, в котором они идут на
+    // первом экране)
+    // Активация успешной или неуспешной выдачи должна производится по нажатию
+    // комбинаций клавиш - на ваше усмотрение
+    // При успешной / неуспешной транзакции выполняется cb (result), где result - результат
+    // операции (true/false)
+}
 
     /**
      * Placeholder emulating the return of change
