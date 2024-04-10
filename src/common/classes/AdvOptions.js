@@ -10,7 +10,7 @@ export class AdvancedOption {
         id,
         name,
         pricePerUnit,
-        quantity,
+        quantity = 100,
     ){
         this.id = id;
         this.name = name;
@@ -21,7 +21,7 @@ export class AdvancedOption {
 
 export class AdvancedOptions {
     #optionsList;
-    
+
     /**
      * Advanced options collection
      * @param {AdvancedOption[]} advOptionsList The list of all advanced options

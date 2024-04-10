@@ -1,20 +1,5 @@
 import { Category, Product, Storage, AdvancedOptions, AdvancedOption } from '../common/classes';
 
-export const storage = new Storage(
-    [
-        new Category(1, 'Кофе', require('../static/categories/coffee.png'), placeholderCoffee),
-        new Category(2, 'Чай', require('../static/categories/tea.png'), placeholderTea),
-        new Category(3, 'Молочный коктейль', require('../static/categories/coctail.png'), placeholderCoctail),
-        new Category(4, 'Морсы и газ.напитки', require('../static/categories/juice.png'), placeholderJuice),
-    ],
-    new AdvancedOptions([
-        new AdvancedOption(1, 'Ванильный сироп', 7),
-        new AdvancedOption(2, 'Мятный сироп', 5),
-        new AdvancedOption(3, 'Карамельный сироп', 9),
-        new AdvancedOption(4, 'Шоколадный сироп', 10),
-    ]),
-)
-
 const placeholderCoffee = [
     new Product(1, "Эспрессо", require('../static/products/coffee/espresso.png'), 79, 109, 129),
     new Product(2, "Эспрессо 2х", require('../static/products/coffee/espresso2x.png'), 82, 112, 132),
@@ -51,6 +36,21 @@ const placeholderJuice = [
     new Product(2, "Коктейль 2", require('../static/products/coffee/espresso2x.png'), 82, 112, 132),
     new Product(3, "Коктейль 3", require('../static/products/coffee/amerikano.png'), 90, 120, 150),
 ];
+
+export const storage = new Storage(
+    [
+        new Category(1, 'Кофе', require('../static/categories/coffee.png'), placeholderCoffee),
+        new Category(2, 'Чай', require('../static/categories/tea.png'), placeholderTea),
+        new Category(3, 'Молочный коктейль', require('../static/categories/coctail.png'), placeholderCoctail),
+        new Category(4, 'Морсы и газ.напитки', require('../static/categories/juice.png'), placeholderJuice),
+    ],
+    new AdvancedOptions([
+        new AdvancedOption(1, 'Ванильный сироп', 7),
+        new AdvancedOption(2, 'Мятный сироп', 5),
+        new AdvancedOption(3, 'Карамельный сироп', 9),
+        new AdvancedOption(4, 'Шоколадный сироп', 10),
+    ]),
+)
 
 // export const productData = [
 //     new Category(1, 'Кофе', require('../static/categories/coffee.png'), placeholderCoffee),
