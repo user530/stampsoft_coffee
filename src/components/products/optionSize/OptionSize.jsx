@@ -1,32 +1,12 @@
 import React from 'react';
 import styles from './OptionSize.module.scss';
-import sprite from '../../../static/sprite.svg';
 
 export const OptionSize = (props) => {
-    const { productName, productImg, sizeClickCb, advClickCb } = props;
+    const { productName, productImg, productOptions, sizeClickCb, advClickCb } = props;
 
-    const options = [
-        {
-            id: 1,
-            value: '200 мл.',
-            iconSrc: `${sprite}#cup_symbol`,
-            iconSize: 119,
-        },
-        {
-            id: 2,
-            value: '300 мл.',
-            iconSrc: `${sprite}#cup_symbol`,
-            iconSize: 143,
-        },
-        {
-            id: 3,
-            value: '400 мл.',
-            iconSrc: `${sprite}#cup_symbol`,
-            iconSize: 174,
-        },
-    ]
+    const optionsMetadata = productOptions.map(sizePricePair => sizePricePair[0]);
 
-    const [selectedSize, setSelectedSize] = React.useState(options[0].id);
+    const [selectedSize, setSelectedSize] = React.useState(optionsMetadata[0].optionId);
 
     return ( 
         <div className={styles['wrapper']}>  
@@ -38,20 +18,25 @@ export const OptionSize = (props) => {
 
             <div className={styles['option__btns']}>
                 {
-                    options.map(
-                        ({ id, value, iconSrc, iconSize }) => (
+                    optionsMetadata.map(
+                        ({ optionId, optionName, optionImg, optionImgHeight }, optionPrice) => (
                             <div 
-                            key={id + value} 
+                            key={optionId + optionName} 
                             className={
-                                `${styles['option__item']} ${selectedSize === id ? styles['active'] : ''}` 
+                                `${styles['option__item']} ${selectedSize === optionId ? styles['active'] : ''}` 
                             }
-                            onClick={() => setSelectedSize(id)}
+                            onClick={
+                                () => {
+                                    setSelectedSize(optionId);
+                                    sizeClickCb(optionId);
+                                }
+                            }
                             >
                                 <div>
-                                    <svg height={iconSize}><use href={iconSrc}/></svg>
+                                    <svg height={optionImgHeight}><use href={optionImg}/></svg>
                                 </div> 
                                 
-                                <span>{value}</span>
+                                <span>{optionName}</span>
                             </div>
                         )
                     )

@@ -2,59 +2,70 @@ import React from 'react';
 import styles from './OptionAdvanced.module.scss';
 import { HiPlus, HiMinus } from "react-icons/hi2";
 
-export const OptionAdvanced = () => {
+export const OptionAdvanced = (props) => {
+    const { optionsData, cartItem, setCartItem } = props;
 
-    const advancedOptions = [
-        {
-            id: 1,
-            name: 'Ванильный сироп',
-        },
-        {
-            id: 2,
-            name: 'Мятный сироп',
-        },
-        {
-            id: 3,
-            name: 'Карамельный сироп',
-        },
-        {
-            id: 4,
-            name: 'Шоколадный сироп',
-        },
-    ];
-
-    const OPTION_MIN = 0;
-    const OPTION_MAX = 99;
-    const OPTION_STEP = 5;
-
-    const defaultAdvancedOptions = advancedOptions.reduce(
-        (reducedObj, {id}) => {
-            if(!(id in reducedObj))
-                reducedObj[id] = 0;
-            return reducedObj;
-        },
-        {}
-    )
-        
-    const [selectedAdvanced, setSelectedAvanced] = React.useState(defaultAdvancedOptions);
+    // Cart item options slice
+    const { advancedOptions } = cartItem;
     
+    console.log(props.cartItem);
+    console.log(optionsData);
+
+    // Advanced options meta(storage) data
+    const optionsMetadata = optionsData.list || [];
+    
+    /**
+     * Create new selection from the current one with updated option
+     * @param {number} optionId Advanced option to change value
+     * @param {boolean} plus If true - adds a step to the option, minus else 
+     * @returns New selection with one option update, or null if option is not found
+     */
+    const updatedSelection = (optionId, plus = true) => {
+        const singleOptionMetadata = optionsMetadata.find(option => option.id === optionId);
+
+        if(!optionId || !singleOptionMetadata) return null;
+        
+        const updatedAdvOptions = {
+            ...cartItem.advancedOptions, 
+            [optionId]: Math.min(
+                singleOptionMetadata.quantity, 
+                advancedOptions[optionId] + (plus ? 1 : -1) * singleOptionMetadata.step
+            )
+        };
+
+        const oldAdvAmount = optionsData.calculateAdvOptions(cartItem.advancedOptions);
+        const newAdvAmount = optionsData.calculateAdvOptions(updatedAdvOptions); 
+        
+        return (
+            {
+                ...cartItem, 
+                advancedOptions: updatedAdvOptions,
+                totalAmount: cartItem.totalAmount  + (newAdvAmount - oldAdvAmount),
+            }
+        );
+    }
+
     const incrementOption = (optionId) => {
-        setSelectedAvanced(
-            prev => ({...prev, [optionId]: Math.min(OPTION_MAX, prev[optionId] + OPTION_STEP) })
-        )
+        const newSelection = updatedSelection(optionId);
+        
+        if(!newSelection) return;
+
+        setCartItem(newSelection);
     };
 
     const decrementOption = (optionId) => {
-        setSelectedAvanced(
-            prev => ({...prev, [optionId]: Math.max(OPTION_MIN, prev[optionId] - OPTION_STEP) })
-        )
+        const newSelection = updatedSelection(optionId, false);
+
+        if(!newSelection) return;
+
+        setCartItem(newSelection);
     };
 
     return (
         <div className={styles['wrapper']}>
             {
-                advancedOptions.map(
-                    ({id, name }) => {
+                optionsMetadata.map(
+                    ({id, name, quantity }) => {
                         return (
                             <div key={id + name} className={styles['option-item']}>
                                 <p className={styles['option-name']}>
@@ -62,16 +73,16 @@ export const OptionAdvanced = () => {
                                 </p>
                                 <div className={styles['option-counter']}>
                                     <button 
-                                    disabled={ selectedAdvanced[id] <= OPTION_MIN }
+                                    disabled={ advancedOptions[id] <= 0 }
                                     onClick={() => decrementOption(id)}
                                     >
                                         <HiMinus/>
                                     </button>
 
-                                    <span>{ selectedAdvanced[id] } гр.</span>
+                                    <span>{ advancedOptions[id] } гр.</span>
 
                                     <button
-                                    disabled={ selectedAdvanced[id] >= OPTION_MAX }
+                                    disabled={ advancedOptions[id] >= quantity }
                                     onClick={() => incrementOption(id)}
                                     >
                                         <HiPlus/>
