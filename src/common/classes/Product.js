@@ -24,12 +24,12 @@ const MetaSizeBig = {
 export class Product {
     /**
      * Data about single drink
-     * @param { Number } productId Drink identifier
-     * @param { String } productName Drink name
-     * @param { String } productImg Drink image
-     * @param { Number } productPriceSmall Price of the small serving
-     * @param { Number } productPriceMedium Price of the medium serving
-     * @param { Number } productPriceBig Price of the big serving
+     * @param { number } productId Drink identifier
+     * @param { string } productName Drink name
+     * @param { string } productImg Drink image
+     * @param { number } productPriceSmall Price of the small serving
+     * @param { number } productPriceMedium Price of the medium serving
+     * @param { number } productPriceBig Price of the big serving
      */
     constructor(
         productId, 
@@ -51,8 +51,7 @@ export class Product {
             this.quantity = productQuantity;
         }
     
-    getSizePriceById = (sizeId) => {
-        const optionPair = this.sizes.find(optionPair => optionPair[0].optionId === sizeId);
-        return (optionPair && optionPair[1]) ? optionPair[1] : 0;
+    getOptionDataById = (sizeId) => {
+        return this.sizes.find(optionPair => optionPair[0].optionId === sizeId);
     }
 }
