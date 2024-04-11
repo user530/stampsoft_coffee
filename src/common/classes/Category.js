@@ -1,9 +1,9 @@
 export class Category {
     /**
      * Data about whole category of drinks
-     * @param { Number } categoryId Category id 
-     * @param { String } categoryName Category name
-     * @param { String } categoryImg Category img
+     * @param { number } categoryId Category id 
+     * @param { string } categoryName Category name
+     * @param { string } categoryImg Category img
      * @param { Product[] } categoryProducts Category products
      */
     constructor(

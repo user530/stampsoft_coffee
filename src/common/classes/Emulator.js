@@ -95,7 +95,7 @@ export class Emulator {
 
     /**
      * Register callback for a specified event
-     * @param {String} eventName Name of the event to listen to
+     * @param {string} eventName Name of the event to listen to
      * @param {Function} cb Callback to fire each time event fires
      */
     registerCallback = (eventName, cb) => {
@@ -108,7 +108,7 @@ export class Emulator {
 
     /**
      * Clear all events associated with the specified event
-     * @param {String} eventName Name of the event to clear 
+     * @param {string} eventName Name of the event to clear 
      */
     clearEventCallbacks = (eventName) => {
         if(typeof eventName !== 'string' 
@@ -224,6 +224,9 @@ export class Emulator {
                 if(!pinCheck)
                      throw new Error('Неверный PIN код!');
                 
+                // Confirm charged amount
+                console.log(`Списано по банковской карте: ${this.#chargedAmount}р`);
+
                 // Successful confirm
                 this.#callbacks['confirmPayment'](true);
 
@@ -442,9 +445,9 @@ export class Emulator {
 
     /**
      * Emulate the check of validity of some data
-     * @param {Boolean} isValid Emulated result that will be returned in the specified time 
-     * @param {Number} timer Time in seconds to wait before the return 
-     * @returns {Promise<Boolean>} Promise of the emulated result 
+     * @param {boolean} isValid Emulated result that will be returned in the specified time 
+     * @param {number} timer Time in seconds to wait before the return 
+     * @returns {Promise<boolean>} Promise of the emulated result 
      */
     emulateCheck = async (isValid, timer = 2000) => new Promise(
             (resolve) => setTimeout(
