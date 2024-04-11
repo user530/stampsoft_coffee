@@ -97,15 +97,18 @@
     }
 }
 
-.products__content {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+.products__content-wrapper {
     margin-top: 62px;
     height: 1007px;
     overflow: hidden;
     overflow-y: auto;
     scrollbar-width: none;
+}
+
+.products__content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
     
     &::-webkit-scrollbar {
         display: none;

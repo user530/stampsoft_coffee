@@ -9,11 +9,19 @@ import { OptionSize } from './optionSize/OptionSize';
 import { OptionAdvanced } from './optionAdvanced/OptionAdvanced';
 
 export const Products = (props) => {
-    const { productData, next, prev, setSelectedProduct, } = props;
-
+    const { storageData, next, prev, cartItem, setCartItem } = props;
+    console.log('Products fired!');
+    
     const onTimeout = React.useCallback(
         () => { 
-            setSelectedProduct(null); 
+            // setCartItem({
+            //     product: { 
+            //         productId: null, 
+            //         sizeId: null
+            //     },
+            //     advancedOptions: {},
+            //     totalAmount: 0,
+            // });
             // prev();
         },
         []
@@ -32,9 +40,10 @@ export const Products = (props) => {
         selectedCategory, 
         categoryProducts, 
         setSelectedCategory
-    } = useSelection(productData[0]);
+    } = useSelection(storageData.categories[0]);
 
-    const [selectedItem, setSelectedItem] = React.useState(selectedCategory.products[0] || {name: '', img: ''});
+    // Get the selected product if there is any
+    const selectedProduct = cartItem?.product?.productId && selectedCategory.getProductById(cartItem.product.productId);
 
     const [sizePopupOpen, setSizePopupOpen] = React.useState(false);
     const closeSizePopup = React.useCallback(() => setSizePopupOpen(false), []);
@@ -42,6 +51,35 @@ export const Products = (props) => {
     const [advancedPopupOpen, setAdvancedPopupOpen] = React.useState(false);
     const closeAdvancedPopup = React.useCallback(() => setAdvancedPopupOpen(false), []);
     const openAdvancedPopup = React.useCallback(() => setAdvancedPopupOpen(true), []);
+
+    const categoryClickHandler = (category) => setSelectedCategory(category);
+
+    const productClickHandler = (product) => {
+        console.log(cartItem.advancedOptions);
+        // Create new cart selection based on the data (category, product, option)
+        const newSelection = storageData.generateCart(
+            selectedCategory.id, 
+            product.id, 
+            product.sizes[0][0].optionId,
+        );
+
+        setCartItem(newSelection);
+        setSizePopupOpen(true);
+    };
+
+    const sizeClickHandler = (sizeOptionId) => {
+        const {categoryId, productId} = cartItem.product;
+
+        // Create new selection with new size option (and current advanced options if any)
+        const newSelection = storageData.generateCart(
+            categoryId, 
+            productId, 
+            sizeOptionId,
+            cartItem.advancedOptions ? cartItem.advancedOptions : null,
+        );
+
+        setCartItem(newSelection);
+    };
 
     return (
         <section className={`${styles['wrapper']} ${styles['theme-' + selectedCategory.id]}`}>
@@ -54,7 +92,7 @@ export const Products = (props) => {
             
             <div className={styles['categories']}>
                 {
-                    productData.map(
+                    categoryProducts.map(
                         (category) => {
                             const {id, name, img} = category;
 
@@ -63,7 +101,7 @@ export const Products = (props) => {
                                     key={name + id} 
                                     name={name} 
                                     img={img} 
-                                    clickHandler={() => setSelectedCategory(category)} 
+                                    clickHandler={() => categoryClickHandler(category)} 
                                     isSelected={name === selectedCategory.name} 
                                 />
                             )
@@ -77,53 +115,65 @@ export const Products = (props) => {
                     <h2 className={styles['h2']}>{selectedCategory.name}</h2>
                 </header>
 
-                <div className={styles['products__content']}>
+                <div className={styles['products__content-wrapper']}>
+                    <div className={styles['products__content']}>
                     {
                         categoryProducts.map(
                             (item) => {
-                                const {id, name, img, starterPrice} = item;
-
+                                const {id, name, img, sizes} = item;
+                                
                                 return (
                                     <ProductItem 
                                         key={id + name} 
                                         img={img} 
                                         name={name} 
-                                        starterPrice={starterPrice} 
-                                        clickHandler={()=>{
-                                            setSelectedItem(item);
-                                            setSizePopupOpen(true);
-                                        }}
+                                        starterPrice={sizes[0][1]} 
+                                        clickHandler={() => productClickHandler(item)}
                                     />
                                 )
                             }
                         )
                     }
                 </div>
+                </div>
             </div>
             
-            <Popup 
-            key={1} 
-            price={229} 
-            isOpen={sizePopupOpen} 
-            closeCb={closeSizePopup} 
-            nextCb={clickHandler}
-            >
-                <OptionSize 
-                sizeClickCb={()=>console.log('Size selected!')} 
-                advClickCb={openAdvancedPopup} 
-                productName={selectedItem.name} 
-                productImg={selectedItem.img} />
-            </Popup>
+            {
+                (cartItem?.product?.productId) &&
+                <Popup 
+                key={1} 
+                price={cartItem.totalAmount}
+                isOpen={sizePopupOpen} 
+                closeCb={closeSizePopup} 
+                nextCb={clickHandler}
+                >
+                    <OptionSize 
+                    sizeClickCb={sizeClickHandler} 
+                    advClickCb={openAdvancedPopup} 
+                    productName={selectedProduct.name} 
+                    productImg={selectedProduct.img} 
+                    productOptions={selectedProduct.sizes}
+                    />
+                </Popup>
+            }
 
-            <Popup 
-            key={2} 
-            price={229} 
-            isOpen={advancedPopupOpen} 
-            closeCb={closeAdvancedPopup} 
-            nextCb={clickHandler}
-            >
-                <OptionAdvanced />
-            </Popup>
+            {
+                (cartItem?.product?.productId) &&
+                <Popup 
+                    key={2} 
+                    price={cartItem.totalAmount} 
+                    isOpen={advancedPopupOpen} 
+                    closeCb={closeAdvancedPopup} 
+                    nextCb={clickHandler}
+                    >
+                        <OptionAdvanced 
+                        optionsData={storageData.advOptions}
+                        cartItem={cartItem}
+                        setCartItem={setCartItem}
+                        />
+                </Popup>
+            }
+            
             
         </section>
     )
