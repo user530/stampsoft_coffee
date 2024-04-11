@@ -4,7 +4,7 @@ import { PayCard } from './components/payCard/PayCard';
 import { PayCash } from './components/payCash/PayCash';
 import { Products } from './components/products/Products';
 import { Promo } from './components/promo/Promo';
-import { productData } from './data/data';
+import { storage } from './data/data';
 import { SelectPayment } from './components/selectPayment/SelectPayment';
 import { PaymentFail } from './components/paymentFail/PaymentFail';
 import { Brewing } from './components/brewing/Brewing';
@@ -14,10 +14,19 @@ import { NoProduct } from './components/noProduct/NoProduct';
 
 function App() {
   const [appState, setAppState] = React.useState('promo');
-  const [products, setProducts] = React.useState([]);
-  const [selectedProduct, setSelectedProduct] = React.useState(null);
+  const [storageData, setStorageData] = React.useState({});
+  const [cartItem, setCartItem] = React.useState({
+      product: { 
+        categoryId: storage.categories[0].id,
+        productId: null, 
+        sizeId: null
+      },
+      advancedOptions: storage.advOptions.getEmptyAdvOptions(),
+      totalAmount: 0,
+    }
+  );
   const [failureReason, setFailureReason] = React.useState('');
-
+  
   const toPromo = React.useCallback(() => setAppState('promo'), []);
   const toProducts = React.useCallback(() => setAppState('products'), []);
   const toPayment = React.useCallback(() => setAppState('selectPayment'), []);
@@ -28,7 +37,7 @@ function App() {
   const toFail = React.useCallback((reason) => {setAppState('fail'); setFailureReason(reason);}, []);
 
   React.useEffect(
-    () => setProducts(productData),
+    () => setStorageData(storage),
     []
   )
   
@@ -41,7 +50,7 @@ function App() {
 
       {
         appState === 'products' 
-        && <Products productData={products} next={toPayment} prev={toPromo} setSelectedProduct={setSelectedProduct} />
+        && <Products storageData={storageData} next={toPayment} prev={toPromo} cartItem={cartItem} setCartItem={setCartItem} />
       }
 
       {
@@ -51,12 +60,12 @@ function App() {
 
       {
         appState === 'payCard' 
-        && <PayCard next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} />
+        && <PayCard next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} totalAmount={cartItem.totalAmount}/>
       }
 
       {
         appState === 'payCash' 
-        && <PayCash next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} />
+        && <PayCash next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} totalAmount={cartItem.totalAmount}/>
       }
 
       {

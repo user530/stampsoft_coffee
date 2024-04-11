@@ -5,9 +5,7 @@ import { PinPad } from './pinPad/PinPad';
 import { useAppContext } from '../../hooks/context/AppContext';
 
 export const PayCard = (props) => {
-    const { next, prev } = props;
-
-    const amountToPay = 250;
+    const { next, prev, totalAmount } = props;
 
     const nextSuccess = next(true);
     const nextFailure = next(false);
@@ -57,7 +55,7 @@ export const PayCard = (props) => {
         () => {
             window.addEventListener('keydown', keyPressHandler);
             BankCardPurchase(
-                250, 
+                totalAmount, 
                 (result, reason) => {
                     console.log(`Card purchase CB fired! Processing result: ${result}`);
                     if(result) {

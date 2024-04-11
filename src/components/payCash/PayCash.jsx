@@ -4,14 +4,13 @@ import { FaRegMoneyBillAlt } from "react-icons/fa";
 import { useAppContext } from '../../hooks/context/AppContext';
 
 export const PayCash = (props) => {
-    const { next, prev } = props;
+    const { next, prev, totalAmount } = props;
     const btnFillRef = React.useRef(null);
     
-    const {state, dispatch} = useAppContext();
-    console.log(state.emulator);
-    const { CashPurchase, StartCashin, EmitCashin, StopCashin, EmitConfirm, EmitCancel } = state.emulator;
+    const { state } = useAppContext();
     
-    const sumRequired = 250;
+    const { CashPurchase, EmitCashin, StopCashin, EmitConfirm, EmitCancel } = state.emulator;
+    
     const [sumInputed, setSumInputed] = React.useState(0);
     
     const submitClickHandler = () => { next(); };
@@ -29,16 +28,15 @@ export const PayCash = (props) => {
     const handleCashin = (amount) => {
         console.log(`Handle cash in fired:`);
         console.log(`Current stash: ${sumInputed}`);
-        console.log(`Sum required: ${sumRequired}`);
+        console.log(`Sum required: ${totalAmount}`);
         console.log(`Amount inserted: ${amount}`);
         setSumInputed(prev => prev + amount);
-        // setSumInputed(prev => prev < sumRequired ? prev + amount : prev);
     }
 
     React.useEffect(
         () => {
             console.log(sumInputed);
-            if(sumInputed >= sumRequired) {
+            if(sumInputed >= totalAmount) {
                 StopCashin(() => {console.log('Cash In Stoped!')});
             }
         },
@@ -88,18 +86,18 @@ export const PayCash = (props) => {
             <div className={styles['control-buttons']}>
                 <button 
                 onClick={
-                    () => EmitConfirm({type: 'cash', change: sumInputed - sumRequired })
+                    () => EmitConfirm({type: 'cash', change: sumInputed - totalAmount })
                 } 
                 // onClick={submitClickHandler} 
-                className={styles['filled']} disabled={sumInputed < sumRequired}>
+                className={styles['filled']} disabled={sumInputed < totalAmount}>
                     <span 
                     ref={ btnFillRef } 
                     className={styles['filled__overlay']} 
-                    style={{width: `${sumInputed * 100/sumRequired}%`}}
+                    style={{width: `${sumInputed * 100/totalAmount}%`}}
 
                     ></span>
                     <span>
-                        { sumInputed < sumRequired ? `Внесено: ${sumInputed} / ${sumRequired}` : 'Оплатить'}
+                        { sumInputed < totalAmount ? `Внесено: ${sumInputed} / ${totalAmount}` : 'Оплатить'}
                     </span>
                 </button>
                 <button 
