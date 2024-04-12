@@ -7,10 +7,14 @@ import { ProductItem } from './productItem/ProductItem';
 import { Popup } from './popup/Popup';
 import { OptionSize } from './optionSize/OptionSize';
 import { OptionAdvanced } from './optionAdvanced/OptionAdvanced';
+import { useAppContext } from '../../hooks/context/AppContext';
 
 export const Products = (props) => {
-    const { storageData, next, prev, cartItem, setCartItem } = props;
+    const { next, prev, cartItem, setCartItem } = props;
     console.log('Products fired!');
+
+    const { state } = useAppContext();
+    const { storage } = state;
     
     // Clear the cart and return to the promo screen on long idle
     // const onTimeout = React.useCallback(
@@ -36,7 +40,7 @@ export const Products = (props) => {
         selectedCategory, 
         categoryProducts, 
         setSelectedCategory
-    } = useSelection(storageData.categories[0]);
+    } = useSelection(storage.categories[0]);
 
     // Get the selected product if there is any
     const selectedProduct = cartItem?.product?.productId && selectedCategory.getProductById(cartItem.product.productId);
@@ -52,7 +56,7 @@ export const Products = (props) => {
 
     const productClickHandler = (product) => {
         // Create new cart selection based on the data (category, product, option)
-        const newSelection = storageData.generateCart(
+        const newSelection = storage.generateCart(
             selectedCategory.id, 
             product.id, 
             product.sizes[0][0].optionId,
@@ -66,7 +70,7 @@ export const Products = (props) => {
         const {categoryId, productId} = cartItem.product;
 
         // Create new selection with new size option (and current advanced options if any)
-        const newSelection = storageData.generateCart(
+        const newSelection = storage.generateCart(
             categoryId, 
             productId, 
             sizeOptionId,
@@ -87,7 +91,7 @@ export const Products = (props) => {
             
             <div className={styles['categories']}>
                 {
-                    storageData.categories.map(
+                    storage.categories.map(
                         (category) => {
                             const {id, name, img} = category;
 
@@ -163,7 +167,7 @@ export const Products = (props) => {
                     nextCb={clickHandler}
                     >
                         <OptionAdvanced 
-                        optionsData={storageData.advOptions}
+                        optionsData={storage.advOptions}
                         cartItem={cartItem}
                         setCartItem={setCartItem}
                         />

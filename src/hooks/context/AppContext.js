@@ -1,9 +1,11 @@
 import React from 'react';
 import { Emulator } from '../../common/classes';
 import { emulatorReducer } from '../../hooks/reducers/emulator';
+import { storage } from '../../data/data';
 
 const initialState = {
     emulator: new Emulator(),
+    storage: storage,
 }
 
 const AppContext = React.createContext();

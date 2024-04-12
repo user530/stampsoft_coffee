@@ -14,7 +14,6 @@ import { NoProduct } from './components/noProduct/NoProduct';
 
 function App() {
   const [appState, setAppState] = React.useState('promo');
-  const [storageData, setStorageData] = React.useState({});
   const [cartItem, setCartItem] = React.useState(null);
   const [failureReason, setFailureReason] = React.useState('');
   
@@ -26,11 +25,6 @@ function App() {
   const toBrewing = React.useCallback(() => setAppState('brewing'), []);
   const toSuccess = React.useCallback(() => setAppState('success'), []);
   const toFail = React.useCallback((reason) => {setAppState('fail'); setFailureReason(reason);}, []);
-
-  React.useEffect(
-    () => setStorageData(storage),
-    []
-  )
   
   return (
     <main className={styles['app-wrapper']}>
@@ -41,7 +35,7 @@ function App() {
 
       {
         appState === 'products' 
-        && <Products storageData={storageData} next={toPayment} prev={toPromo} cartItem={cartItem} setCartItem={setCartItem} />
+        && <Products next={toPayment} prev={toPromo} cartItem={cartItem} setCartItem={setCartItem} />
       }
 
       {
