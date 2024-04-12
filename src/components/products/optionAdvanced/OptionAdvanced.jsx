@@ -1,15 +1,14 @@
 import React from 'react';
 import styles from './OptionAdvanced.module.scss';
 import { HiPlus, HiMinus } from "react-icons/hi2";
+import { useAppContext } from '../../../hooks/context/AppContext';
 
-export const OptionAdvanced = (props) => {
-    const { optionsData, cartItem, setCartItem } = props;
+export const OptionAdvanced = () => {
+    const { state, dispatch } = useAppContext();
+    const { cart: cartItem, storage: { advOptions: optionsData } } = state;
 
     // Cart item options slice
     const { advancedOptions } = cartItem;
-    
-    console.log(props.cartItem);
-    console.log(optionsData);
 
     // Advanced options meta(storage) data
     const optionsMetadata = optionsData.list || [];
@@ -50,7 +49,7 @@ export const OptionAdvanced = (props) => {
         
         if(!newSelection) return;
 
-        setCartItem(newSelection);
+        dispatch({type: 'SET_CART', payload: newSelection});
     };
 
     const decrementOption = (optionId) => {
@@ -58,7 +57,7 @@ export const OptionAdvanced = (props) => {
 
         if(!newSelection) return;
 
-        setCartItem(newSelection);
+        dispatch({type: 'SET_CART', payload: newSelection});
     };
 
     return (
