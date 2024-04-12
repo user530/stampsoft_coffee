@@ -1,17 +1,25 @@
 import React from 'react';
 import { Emulator } from '../../common/classes';
-import { emulatorReducer } from '../../hooks/reducers/emulator';
 import { storage } from '../../data/data';
+import { combineReducers, emulatorReducer, storageReducer, cartReducer } from '../reducers';
 
 const initialState = {
     emulator: new Emulator(),
     storage: storage,
+    cart: null,
 }
 
 const AppContext = React.createContext();
 
 export const AppProvider = ({ children }) => {
-    const [state, dispatch] = React.useReducer(emulatorReducer, initialState);
+    
+    const rootReducer = combineReducers({
+        emulator: emulatorReducer,
+        storage: storageReducer,        
+        cart: cartReducer,
+    });
+
+    const [state, dispatch] = React.useReducer(rootReducer, initialState);
 
     return (
         <AppContext.Provider value={{state, dispatch}}>
