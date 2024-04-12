@@ -10,22 +10,23 @@ import { OptionAdvanced } from './optionAdvanced/OptionAdvanced';
 import { useAppContext } from '../../hooks/context/AppContext';
 
 export const Products = (props) => {
-    const { next, prev, cartItem, setCartItem } = props;
-    console.log('Products fired!');
+    const { next, prev } = props;
+    
+    const { state, dispatch } = useAppContext();
+    const { storage, cart } = state;
 
-    const { state } = useAppContext();
-    const { storage } = state;
-    
+    console.log(cart);
+
     // Clear the cart and return to the promo screen on long idle
-    // const onTimeout = React.useCallback(
-    //     () => { 
-    //         setCartItem(null);
-    //         prev();
-    //     },
-    //     []
-    // );
-    
-    // useTimeout(onTimeout);
+    const timeoutCb = React.useCallback(
+        () => { 
+            dispatch({type: 'SET_CART', payload: null});
+            prev();
+        },
+        []
+    );
+    // Activate idle handler
+    useTimeout(timeoutCb);
 
     const clickHandler = React.useCallback(
         () => {
@@ -34,16 +35,13 @@ export const Products = (props) => {
         },
         []
     );
-
-
+    
     const {
         selectedCategory, 
         categoryProducts, 
-        setSelectedCategory
+        setSelectedCategory,
+        setCategoryProducts
     } = useSelection(storage.categories[0]);
-
-    // Get the selected product if there is any
-    const selectedProduct = cartItem?.product?.productId && selectedCategory.getProductById(cartItem.product.productId);
 
     const [sizePopupOpen, setSizePopupOpen] = React.useState(false);
     const closeSizePopup = React.useCallback(() => setSizePopupOpen(false), []);
@@ -52,7 +50,10 @@ export const Products = (props) => {
     const closeAdvancedPopup = React.useCallback(() => setAdvancedPopupOpen(false), []);
     const openAdvancedPopup = React.useCallback(() => setAdvancedPopupOpen(true), []);
 
-    const categoryClickHandler = (category) => setSelectedCategory(category);
+    const categoryClickHandler = (category) => {
+        setSelectedCategory(category);
+        setCategoryProducts(category.products);
+    }
 
     const productClickHandler = (product) => {
         // Create new cart selection based on the data (category, product, option)
@@ -61,23 +62,25 @@ export const Products = (props) => {
             product.id, 
             product.sizes[0][0].optionId,
         );
-
-        setCartItem(newSelection);
+        
+        // Update cart data
+        dispatch({type: 'SET_CART', payload: newSelection});
         setSizePopupOpen(true);
     };
 
     const sizeClickHandler = (sizeOptionId) => {
-        const {categoryId, productId} = cartItem.product;
-
+        const {categoryId, productId} = cart.product;
+        
         // Create new selection with new size option (and current advanced options if any)
         const newSelection = storage.generateCart(
             categoryId, 
             productId, 
             sizeOptionId,
-            cartItem.advancedOptions ? cartItem.advancedOptions : null,
+            cart.advancedOptions ? cart.advancedOptions : null,
         );
-
-        setCartItem(newSelection);
+        
+        // Update cart data
+        dispatch({type: 'SET_CART', payload: newSelection});
     };
 
     return (
@@ -138,39 +141,31 @@ export const Products = (props) => {
             </div>
             
             {
-                (cartItem?.product?.productId) &&
+                (cart?.product?.productId) &&
                 <Popup 
                 key={1} 
-                price={cartItem.totalAmount}
+                price={cart.totalAmount}
                 isOpen={sizePopupOpen} 
                 closeCb={closeSizePopup} 
                 nextCb={clickHandler}
                 >
                     <OptionSize
-                    sizeOption={cartItem.product.sizeId}
-                    sizeClickCb={sizeClickHandler} 
-                    advClickCb={openAdvancedPopup} 
-                    productName={selectedProduct.name} 
-                    productImg={selectedProduct.img} 
-                    productOptions={selectedProduct.sizes}
+                        sizeClickCb={sizeClickHandler} 
+                        advClickCb={openAdvancedPopup} 
                     />
                 </Popup>
             }
 
             {
-                (cartItem?.product?.productId) &&
+                (cart?.product?.productId) &&
                 <Popup 
                     key={2} 
-                    price={cartItem.totalAmount} 
+                    price={cart.totalAmount} 
                     isOpen={advancedPopupOpen} 
                     closeCb={closeAdvancedPopup} 
                     nextCb={clickHandler}
                     >
-                        <OptionAdvanced 
-                        optionsData={storage.advOptions}
-                        cartItem={cartItem}
-                        setCartItem={setCartItem}
-                        />
+                        <OptionAdvanced />
                 </Popup>
             }
             
