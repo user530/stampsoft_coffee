@@ -5,24 +5,22 @@ import { PinPad } from './pinPad/PinPad';
 import { useAppContext } from '../../hooks/context/AppContext';
 
 export const PayCard = (props) => {
-    const { next, prev, totalAmount } = props;
+    const { next, prev } = props;
 
     const nextSuccess = next(true);
     const nextFailure = next(false);
     
-    const {state, dispatch} = useAppContext();
-    console.log(state.emulator);
-    const {BankCardPurchase, EmitCardIn, EmitCancel, EmitConfirm} = state.emulator;
-
-    const cardInputHandler = (success) => { 
-        if(showPinpad) return;
-        
-        console.log('Card input handler');
-        setShowPinpad(true);
-    };
+    const { state: { emulator, cart } } = useAppContext();
+    
+    const { BankCardPurchase, EmitCardIn, EmitCancel, EmitConfirm } = emulator;
+    const { totalAmount } = cart;
 
     const cancelClickHandler = () => { EmitCancel(); };
 
+    /**
+     * Emulate card input: Press "1" to emulate valid card or press numbers "2" to "5" to emulate invalid card with different fail causes
+     * @param {KeyboardEvent} e Keydown effect representing different card emulations
+     */
     const keyPressHandler = (e) => {
         if(e.key === '1') 
             EmitCardIn({data1: true, data2: true, data3: true, data4: true,})
@@ -39,21 +37,25 @@ export const PayCard = (props) => {
     const [statusText, setStatusText] = React.useState('Приложите карту к терминалу');
     const [showPinpad, setShowPinpad] = React.useState(false);
 
+    // Send interrupt and hide pinpad
     const closePinpad = React.useCallback(
         () => {
             EmitConfirm({type: 'card', interupt: true});
             setShowPinpad(false);
         }, []);
 
+    // Emit payment confirm and supply user pincode
     const submitPin = React.useCallback(
         (pincode) => {
             console.log('Pincode: ' + pincode);
             EmitConfirm({type: 'card', pincode});
         }, []);
 
+    // On component start add keydown listener to handle card input emulations and initiate card purchase
     React.useEffect(
         () => {
             window.addEventListener('keydown', keyPressHandler);
+
             BankCardPurchase(
                 totalAmount, 
                 (result, reason) => {

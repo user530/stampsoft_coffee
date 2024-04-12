@@ -4,18 +4,23 @@ import { FaRegMoneyBillAlt } from "react-icons/fa";
 import { useAppContext } from '../../hooks/context/AppContext';
 
 export const PayCash = (props) => {
-    const { next, prev, totalAmount } = props;
+    const { next, prev } = props;
     const btnFillRef = React.useRef(null);
+
+    const nextSuccess = next(true);
+    const nextFailure = next(false);
     
-    const { state } = useAppContext();
+    const { state: { emulator, cart } } = useAppContext();
     
-    const { CashPurchase, EmitCashin, StopCashin, EmitConfirm, EmitCancel } = state.emulator;
+    const { CashPurchase, EmitCashin, StopCashin, EmitConfirm, EmitCancel } = emulator;
+    const { totalAmount } = cart;
     
     const [sumInputed, setSumInputed] = React.useState(0);
-    
-    const submitClickHandler = () => { next(); };
-    const cancelClickHandler = () => { prev(); };
 
+    /**
+     * Emulate cash input: Press "1" to emulate input of 10rub bill, "2" for 50rub and "3" for 100rub
+     * @param {KeyboardEvent} e Keydown effect representing different card emulations
+     */
     const keyPressHandler = (e) => {
         if(e.key === '1')
             EmitCashin(10)
@@ -26,16 +31,12 @@ export const PayCash = (props) => {
     };
 
     const handleCashin = (amount) => {
-        console.log(`Handle cash in fired:`);
-        console.log(`Current stash: ${sumInputed}`);
-        console.log(`Sum required: ${totalAmount}`);
-        console.log(`Amount inserted: ${amount}`);
         setSumInputed(prev => prev + amount);
     }
 
+    
     React.useEffect(
         () => {
-            console.log(sumInputed);
             if(sumInputed >= totalAmount) {
                 StopCashin(() => {console.log('Cash In Stoped!')});
             }
@@ -46,20 +47,21 @@ export const PayCash = (props) => {
     React.useEffect(
         () => {
             window.addEventListener('keydown', keyPressHandler);
-            // StartCashin(handleCashin)
+            
+            // On component start add keydown listener to handle cash input emulations and initiate cash purchase
             CashPurchase(
                 handleCashin, 
                 (result) => {
                     if(result) {
-                        console.log('CONFIRM RESULT: ', result);
                         // Clear sumInputed
                         setSumInputed(0);
-                        // Add to history?
-                        next(result)();
+                        
+                        nextSuccess();
                     }
                     else {
-                        console.error('Failed to confirm cash operation');
                         // Is this scenario even possible?
+                        console.error('Failed to confirm cash operation');
+                        nextFailure();
                     }
                 }, 
                 (reason) => {
@@ -87,8 +89,7 @@ export const PayCash = (props) => {
                 <button 
                 onClick={
                     () => EmitConfirm({type: 'cash', change: sumInputed - totalAmount })
-                } 
-                // onClick={submitClickHandler} 
+                }
                 className={styles['filled']} disabled={sumInputed < totalAmount}>
                     <span 
                     ref={ btnFillRef } 
@@ -100,9 +101,9 @@ export const PayCash = (props) => {
                         { sumInputed < totalAmount ? `Внесено: ${sumInputed} / ${totalAmount}` : 'Оплатить'}
                     </span>
                 </button>
+
                 <button 
-                onClick={ () => EmitCancel()}
-                // onClick={cancelClickHandler}
+                    onClick={ () => EmitCancel()}
                 >Отмена</button>
             </div>
         </section>

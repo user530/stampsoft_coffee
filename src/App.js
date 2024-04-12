@@ -35,7 +35,7 @@ function App() {
 
       {
         appState === 'products' 
-        && <Products next={toPayment} prev={toPromo} cartItem={cartItem} setCartItem={setCartItem} />
+        && <Products next={toPayment} prev={toPromo} />
       }
 
       {
@@ -45,12 +45,12 @@ function App() {
 
       {
         appState === 'payCard' 
-        && <PayCard next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} totalAmount={cartItem.totalAmount}/>
+        && <PayCard next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} />
       }
 
       {
         appState === 'payCash' 
-        && <PayCash next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} totalAmount={cartItem.totalAmount}/>
+        && <PayCash next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} />
       }
 
       {
