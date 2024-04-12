@@ -2,11 +2,9 @@ import React from 'react';
 import styles from './OptionSize.module.scss';
 
 export const OptionSize = (props) => {
-    const { productName, productImg, productOptions, sizeClickCb, advClickCb } = props;
+    const { sizeOption, productName, productImg, productOptions, sizeClickCb, advClickCb } = props;
 
     const optionsMetadata = productOptions.map(sizePricePair => sizePricePair[0]);
-
-    const [selectedSize, setSelectedSize] = React.useState(optionsMetadata[0].optionId);
 
     return ( 
         <div className={styles['wrapper']}>  
@@ -19,15 +17,14 @@ export const OptionSize = (props) => {
             <div className={styles['option__btns']}>
                 {
                     optionsMetadata.map(
-                        ({ optionId, optionName, optionImg, optionImgHeight }, optionPrice) => (
+                        ({ optionId, optionName, optionImg, optionImgHeight }) => (
                             <div 
                             key={optionId + optionName} 
                             className={
-                                `${styles['option__item']} ${selectedSize === optionId ? styles['active'] : ''}` 
+                                `${styles['option__item']} ${sizeOption === optionId ? styles['active'] : ''}` 
                             }
                             onClick={
                                 () => {
-                                    setSelectedSize(optionId);
                                     sizeClickCb(optionId);
                                 }
                             }
