@@ -23,7 +23,7 @@ export class AdvancedOption {
 }
 
 export class AdvancedOptions {
-    #optionsList;
+    list;
 
     /**
      * Advanced options collection
@@ -32,11 +32,7 @@ export class AdvancedOptions {
     constructor(
         advOptionsList
     ){
-        this.#optionsList = advOptionsList;
-    }
-
-    get list() {
-        return this.#optionsList;
+        this.list = advOptionsList;
     }
 
     /**
@@ -46,7 +42,7 @@ export class AdvancedOptions {
      * @returns Total
      */
     calculateSingleOption = (optionId, optionQuantity) => {
-        const option = this.#optionsList.find(advOption => advOption.id === optionId);
+        const option = this.list.find(advOption => advOption.id === optionId);
         
         if(!option) return 0;
 
@@ -74,7 +70,7 @@ export class AdvancedOptions {
     }
 
     getEmptyAdvOptions = () => {
-        return this.#optionsList.reduce(
+        return this.list.reduce(
             (optionsObj, {id}) => {
                 optionsObj[id] = 0;
                 return optionsObj;

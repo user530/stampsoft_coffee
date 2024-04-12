@@ -1,96 +1,80 @@
 export class Emulator {
-    #status = 'READY';
-    #callbacks = {};
-    #events = ['cashIn', 'cardIn', 'confirmPayment', 'cancelPayment', 'paymentStatusUpdated'];
-    #stash = 0;
-    #cardInserted = false;
-    #interupted = false;
-    #chargedAmount = 0; 
-
-    get status() {
-        return this.#status;
-    }
-    
-    set status(newStatus) {
-        this.#status = newStatus;
-    }
-
-    get stash() {
-        return this.#stash;
-    }
-
-    get cardInserted() {
-        return this.#cardInserted;
-    }
+    status = 'READY';
+    callbacks = {};
+    events = ['cashIn', 'cardIn', 'confirmPayment', 'cancelPayment', 'paymentStatusUpdated'];
+    stash = 0;
+    cardInserted = false;
+    interupted = false;
+    chargedAmount = 0; 
 
     insertCard = () => {
-        this.#cardInserted = true;
+        this.cardInserted = true;
         console.log('Card inserted!');
     }
     
     ejectCard = () => {
-        this.#cardInserted = false;
+        this.cardInserted = false;
         console.log('Card ejected!');
     }
 
     incrementStash = (addToStash) => {
-        this.#stash += addToStash;
+        this.stash += addToStash;
     }
 
     clearStash = () => {
-        this.#stash = 0;
+        this.stash = 0;
     }
 
     setStatusReady = () => {
-        this.#status = 'READY';
+        this.status = 'READY';
     }
 
     setStatusWaitingProductSelect = () => {
-        this.#status = 'WAITING_PRODUCT_SELECT';
+        this.status = 'WAITING_PRODUCT_SELECT';
     }
 
     setStatusWaitingProductVend = () => {
-        this.#status = 'WAITING_PRODUCT_VEND';
+        this.status = 'WAITING_PRODUCT_VEND';
     }
 
     setStatusWaitingCash = () => {
-        this.#status = 'WAITING_CASH';
+        this.status = 'WAITING_CASH';
     }
 
     setStatusWaitingCard = () => {
-        this.#status = 'WAITING_CARD';
+        this.status = 'WAITING_CARD';
     }
 
     setStatusWaitingConfirm = () => {
-        this.#status = 'WAITING_CONFIRM';
+        this.status = 'WAITING_CONFIRM';
     }
 
     setStatusProcessingCard = () => {
-        this.#status = 'PROCESSING_CARD';
+        this.status = 'PROCESSING_CARD';
     }
 
     setStatusProcessing = () => {
-        this.#status = 'PROCESSING';
+        this.status = 'PROCESSING';
     }
 
     clearInterupt = () => {
-        this.#interupted = false;
+        this.interupted = false;
     }
 
     interuptOperation = () => {
-        this.#interupted = true;
+        this.interupted = true;
     }
 
     chargeAmount = (amount) => {
-        this.#chargedAmount = amount;
+        this.chargedAmount = amount;
     }
 
     resetCharged = () => {
-        this.#chargedAmount = 0;
+        this.chargedAmount = 0;
     }
 
     isValidEvent = (eventName) => {
-        return this.#events.includes(eventName);
+        return this.events.includes(eventName);
     }
 
     /**
@@ -103,7 +87,7 @@ export class Emulator {
             || !this.isValidEvent(eventName))
                 return console.error('Cant register callback for the invalid event!');
         
-        this.#callbacks[eventName] = cb;
+        this.callbacks[eventName] = cb;
     }
 
     /**
@@ -115,7 +99,7 @@ export class Emulator {
             || !this.isValidEvent(eventName))
                 return console.error('Cant register callback for the invalid event!');
 
-        this.#callbacks[eventName] = null;
+        this.callbacks[eventName] = null;
     }
     
     /**
@@ -124,7 +108,7 @@ export class Emulator {
      */
     StartCashin = (cb) => {
         /* Skip, if emulator is already busy with some other task  */ 
-        if(this.#status !== 'READY') 
+        if(this.status !== 'READY') 
             return;
         
         // Register callback
@@ -139,7 +123,7 @@ export class Emulator {
      */
     EmitCashin = (cashAmount) => {
         // Skip, if emulator currently not listening to the 'cashIn' events
-        if(this.#status !== 'WAITING_CASH')
+        if(this.status !== 'WAITING_CASH')
             return;
 
         // Check argument 
@@ -153,7 +137,7 @@ export class Emulator {
         this.incrementStash(cashAmount);
 
         // Fire a callback for the event
-        this.#callbacks[cashinEvent.name](cashinEvent);
+        this.callbacks[cashinEvent.name](cashinEvent);
     }
 
     /**
@@ -162,7 +146,7 @@ export class Emulator {
      */
     StopCashin = (cb) => {
         // Skip, if emulator currently not listening to the 'cashIn' events
-        if(this.#status !== 'WAITING_CASH') return;
+        if(this.status !== 'WAITING_CASH') return;
 
         // Clear events and fire callback
         this.clearEventCallbacks('cashIn');
@@ -172,7 +156,7 @@ export class Emulator {
 
     CashPurchase = (cashInCb, confirmCb, cancelCb) => {
         /* Skip, if emulator is already busy with some other task  */ 
-        if(this.#status !== 'READY') 
+        if(this.status !== 'READY') 
             return;
         
         this.registerCallback('confirmPayment', (result) => confirmCb(result));
@@ -185,7 +169,7 @@ export class Emulator {
         console.log('Emit confirm fired');
     
         // Skip, if emulator currently not listening to the 'confirm' events
-        if(this.#status !== 'WAITING_CONFIRM')
+        if(this.status !== 'WAITING_CONFIRM')
             return;
     
         const { type, change, pincode, interupt } = confirmData;
@@ -201,15 +185,15 @@ export class Emulator {
             if(change) this.returnChange(change);
             this.clearStash();
 
-            console.log(this.#status);
+            console.log(this.status);
 
             // Fire a callback for the event, there is no 'failed' confirm so pass true
-            this.#callbacks['confirmPayment'](true);
+            this.callbacks['confirmPayment'](true);
         }
 
         if(type === 'card') {
             // Set status
-            this.#callbacks['paymentStatusUpdated']('Ожидаем подтверждение');
+            this.callbacks['paymentStatusUpdated']('Ожидаем подтверждение');
             
             // Handle card confirmation process
             try {
@@ -225,13 +209,13 @@ export class Emulator {
                      throw new Error('Неверный PIN код!');
                 
                 // Confirm charged amount
-                console.log(`Списано по банковской карте: ${this.#chargedAmount}р`);
+                console.log(`Списано по банковской карте: ${this.chargedAmount}р`);
 
                 // Successful confirm
-                this.#callbacks['confirmPayment'](true);
+                this.callbacks['confirmPayment'](true);
 
             } catch (error) {
-                this.#callbacks['confirmPayment'](false, error.message || 'Непредвиденная ошибка!');
+                this.callbacks['confirmPayment'](false, error.message || 'Непредвиденная ошибка!');
             } finally {
                 // Clean up logic
                 this.ejectCard();
@@ -253,15 +237,15 @@ export class Emulator {
 
         // Skip, if emulator currently not listening to cancelable events
         if(
-            this.#status !== 'WAITING_CONFIRM' 
-            && this.#status !== 'WAITING_CASH' 
-            && this.#status !== 'WAITING_CARD'
-            && this.#status !== 'PROCESSING_CARD'
+            this.status !== 'WAITING_CONFIRM' 
+            && this.status !== 'WAITING_CASH' 
+            && this.status !== 'WAITING_CARD'
+            && this.status !== 'PROCESSING_CARD'
         )
             return
 
         // If currently processing the card -> raise interruption flag and leave at that for gracefull cancel
-        if(this.#status === 'PROCESSING_CARD')
+        if(this.status === 'PROCESSING_CARD')
             return this.interuptOperation();
         
         console.log('Correct status');
@@ -270,40 +254,40 @@ export class Emulator {
         this.setStatusReady();
 
         console.log('Reset status');
-        console.log(this.#status);
+        console.log(this.status);
 
         // Fire a callback for the event
-        this.#callbacks['cancelPayment']('Oперация отменена пользователем!');
+        this.callbacks['cancelPayment']('Oперация отменена пользователем!');
         
         // Clear payment callbacks
         this.clearEventCallbacks('confirmPayment')
         this.clearEventCallbacks('cancelPayment')
 
         // Clear payment listeners
-        if(this.#callbacks['cashIn']) this.clearEventCallbacks('cashIn');
-        if(this.#callbacks['cardIn']) this.clearEventCallbacks('cardIn');
-        if(this.#callbacks['paymentStatusUpdated']) this.clearEventCallbacks('paymentStatusUpdated');
+        if(this.callbacks['cashIn']) this.clearEventCallbacks('cashIn');
+        if(this.callbacks['cardIn']) this.clearEventCallbacks('cardIn');
+        if(this.callbacks['paymentStatusUpdated']) this.clearEventCallbacks('paymentStatusUpdated');
         
         // Refund and clear the stash if user entered some money
-        if(this.#stash) {
-            this.returnChange(this.#stash);
+        if(this.stash) {
+            this.returnChange(this.stash);
             this.clearStash();
         }
 
         // Eject card if any inserted
-        if(this.#cardInserted) {
+        if(this.cardInserted) {
             this.ejectCard();
         }
 
         // Clear payment data
-        this.#chargedAmount = 0;
+        this.chargedAmount = 0;
         
         console.log(this);
     }
 
     BankCardPurchase = (amount, cb, display_cb, confirmCb, cancelCb) => {
         /* Skip, if emulator is already busy with some other task  */ 
-        if(this.#status !== 'READY') 
+        if(this.status !== 'READY') 
             return;
         
         // Update the status
@@ -339,7 +323,7 @@ export class Emulator {
     EmitCardIn = async (cardData) => {
         console.log('Emit cardIn fired');
         /* Skip, if emulator is already busy with some other task  */ 
-        if(this.#status !== 'WAITING_CARD') 
+        if(this.status !== 'WAITING_CARD') 
             return;
 
         // Placeholder function that validates data existence and format
@@ -376,18 +360,18 @@ export class Emulator {
             if(!check3) throw new Error('Неверные данные карты!');
 
             // Emulate amount check -> Here we pass amount to the bank to confirm
-            const check4 = await this.emulateCheck(cardData.data4, this.#chargedAmount);
+            const check4 = await this.emulateCheck(cardData.data4, this.chargedAmount);
             if(!check4) throw new Error('Недостаточно средств на карте!');
 
             this.EmitStatusUpdate('Подтвердите транзакцию');
-            console.log(this.#interupted);
+            console.log(this.interupted);
             // If interuption flag was raised
-            if(this.#interupted) throw new Error('Операция отменена пользователем!');
+            if(this.interupted) throw new Error('Операция отменена пользователем!');
             
             this.setStatusWaitingConfirm();
 
             // Fire a callback for the event
-            this.#callbacks['cardIn'](true);
+            this.callbacks['cardIn'](true);
 
             console.log(this);
 
@@ -397,22 +381,22 @@ export class Emulator {
             this.resetCharged();
             this.clearInterupt();
 
-            return this.#callbacks['cardIn'](false, error.message || 'Непредвиденная ошибка!');
+            return this.callbacks['cardIn'](false, error.message || 'Непредвиденная ошибка!');
         }
     }
 
     EmitStatusUpdate = (newStatus) => {
-        if(this.#status !== 'PROCESSING_CARD') return;
+        if(this.status !== 'PROCESSING_CARD') return;
 
         if(!newStatus)
             return console.error('Provide new status!');
 
-        this.#callbacks['paymentStatusUpdated'](newStatus);
+        this.callbacks['paymentStatusUpdated'](newStatus);
     }
 
     Vending = (cb) => {
         /* Skip, if emulator is already busy with some other task  */ 
-        if(this.#status !== 'READY') 
+        if(this.status !== 'READY') 
             return;
         
         this.registerCallback('selectProduct', (product_idx) => this.setSelection(product_idx));
