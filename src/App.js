@@ -15,16 +15,7 @@ import { NoProduct } from './components/noProduct/NoProduct';
 function App() {
   const [appState, setAppState] = React.useState('promo');
   const [storageData, setStorageData] = React.useState({});
-  const [cartItem, setCartItem] = React.useState({
-      product: { 
-        categoryId: storage.categories[0].id,
-        productId: null, 
-        sizeId: null
-      },
-      advancedOptions: storage.advOptions.getEmptyAdvOptions(),
-      totalAmount: 0,
-    }
-  );
+  const [cartItem, setCartItem] = React.useState(null);
   const [failureReason, setFailureReason] = React.useState('');
   
   const toPromo = React.useCallback(() => setAppState('promo'), []);

@@ -12,20 +12,16 @@ export const Products = (props) => {
     const { storageData, next, prev, cartItem, setCartItem } = props;
     console.log('Products fired!');
     
-    const onTimeout = React.useCallback(
-        () => { 
-            // setCartItem({
-            //     product: { 
-            //         productId: null, 
-            //         sizeId: null
-            //     },
-            //     advancedOptions: {},
-            //     totalAmount: 0,
-            // });
-            // prev();
-        },
-        []
-    );
+    // Clear the cart and return to the promo screen on long idle
+    // const onTimeout = React.useCallback(
+    //     () => { 
+    //         setCartItem(null);
+    //         prev();
+    //     },
+    //     []
+    // );
+    
+    // useTimeout(onTimeout);
 
     const clickHandler = React.useCallback(
         () => {
@@ -35,7 +31,7 @@ export const Products = (props) => {
         []
     );
 
-    useTimeout(onTimeout);
+
     const {
         selectedCategory, 
         categoryProducts, 
@@ -55,7 +51,6 @@ export const Products = (props) => {
     const categoryClickHandler = (category) => setSelectedCategory(category);
 
     const productClickHandler = (product) => {
-        console.log(cartItem.advancedOptions);
         // Create new cart selection based on the data (category, product, option)
         const newSelection = storageData.generateCart(
             selectedCategory.id, 
@@ -92,7 +87,7 @@ export const Products = (props) => {
             
             <div className={styles['categories']}>
                 {
-                    categoryProducts.map(
+                    storageData.categories.map(
                         (category) => {
                             const {id, name, img} = category;
 
@@ -147,7 +142,8 @@ export const Products = (props) => {
                 closeCb={closeSizePopup} 
                 nextCb={clickHandler}
                 >
-                    <OptionSize 
+                    <OptionSize
+                    sizeOption={cartItem.product.sizeId}
                     sizeClickCb={sizeClickHandler} 
                     advClickCb={openAdvancedPopup} 
                     productName={selectedProduct.name} 
