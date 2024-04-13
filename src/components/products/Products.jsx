@@ -151,7 +151,7 @@ export const Products = (props) => {
                     {
                         categoryProducts.map(
                             (item) => {
-                                const {id, name, img, sizes} = item;
+                                const { id, name, img, sizes, quantity } = item;
                                 
                                 return (
                                     <ProductItem 
@@ -159,6 +159,7 @@ export const Products = (props) => {
                                         img={img} 
                                         name={name} 
                                         starterPrice={sizes[0][1]} 
+                                        quantity={quantity}
                                         clickHandler={() => productClickHandler(item)}
                                     />
                                 )
