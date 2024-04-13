@@ -33,6 +33,7 @@ export class Product {
      * @param { number } productPriceSmall Price of the small serving
      * @param { number } productPriceMedium Price of the medium serving
      * @param { number } productPriceBig Price of the big serving
+     * @param { [stepText: string, stepSeconds: number][] } productSteps The array of vending stages that are represented during brewing stage
      */
     constructor(
         productId, 
@@ -41,6 +42,14 @@ export class Product {
         productPriceSmall,
         productPriceMedium,
         productPriceBig,
+        productSteps = [
+            ['Мелем кофе', 10], 
+            ['Добавляем приготовленный кофе', 5], 
+            ['Кипятим воду', 10], 
+            ['Добавляем кипяток', 5], 
+            ['Завариваем кофе', 20], 
+            ['Подготовка в выдаче', 5]
+        ],
         productQuantity = parseInt(Math.random() * 10),
         ){
             this.id = productId;
@@ -52,6 +61,7 @@ export class Product {
                 [MetaSizeBig, productPriceBig],
             ];
             this.quantity = productQuantity;
+            this.steps = productSteps;
         }
     
     getOptionDataById = (sizeId) => {
