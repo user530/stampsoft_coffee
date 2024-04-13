@@ -1,22 +1,24 @@
 import React from 'react';
 import { Emulator } from '../../common/classes';
 import { storage } from '../../data/data';
-import { combineReducers, emulatorReducer, storageReducer, cartReducer } from '../reducers';
+import { combineReducers, emulatorReducer, storageReducer, cartReducer, historyReducer } from '../reducers';
 
 const initialState = {
     emulator: new Emulator(),
     storage: storage,
     cart: null,
+    history: [],
 }
 
 const AppContext = React.createContext();
 
 export const AppProvider = ({ children }) => {
-    
+
     const rootReducer = combineReducers({
         emulator: emulatorReducer,
         storage: storageReducer,        
         cart: cartReducer,
+        history: historyReducer,
     });
 
     const [state, dispatch] = React.useReducer(rootReducer, initialState);
