@@ -3,6 +3,7 @@ import styles from './PayCard.module.scss';
 import sprite from '../../static/sprite.svg';
 import { PinPad } from './pinPad/PinPad';
 import { useAppContext } from '../../hooks/context/AppContext';
+import { Order } from '../../common/classes';
 
 export const PayCard = (props) => {
     const { next, prev } = props;
@@ -10,11 +11,14 @@ export const PayCard = (props) => {
     const nextSuccess = next(true);
     const nextFailure = next(false);
     
-    const { state: { emulator, cart } } = useAppContext();
+    const { state: { emulator, cart, storage }, dispatch } = useAppContext();
     
     const { BankCardPurchase, EmitCardIn, EmitCancel, EmitConfirm } = emulator;
-    const { totalAmount } = cart;
+    const { product, advancedOptions, totalAmount } = cart;
 
+    const { categoryId, productId, sizeId } = product;
+    const cartProduct = storage.getProductByCategoryId(categoryId, productId);
+    
     const cancelClickHandler = () => { EmitCancel(); };
 
     /**
@@ -47,7 +51,6 @@ export const PayCard = (props) => {
     // Emit payment confirm and supply user pincode
     const submitPin = React.useCallback(
         (pincode) => {
-            console.log('Pincode: ' + pincode);
             EmitConfirm({type: 'card', pincode});
         }, []);
 
@@ -59,33 +62,38 @@ export const PayCard = (props) => {
             BankCardPurchase(
                 totalAmount, 
                 (result, reason) => {
-                    console.log(`Card purchase CB fired! Processing result: ${result}`);
                     if(result) {
-                        console.log('CB - Success', result, reason);
                         setShowPinpad(true);
                     }
                     else {
-                        console.log('CB - Failure', result, reason);
                         nextFailure(reason);
                     }
                 }, 
-                (newStatus) => {
-                    console.log('Display CB fired!'); 
+                (newStatus) => { 
                     setStatusText(newStatus);
                 }, 
                 (result, reason) => {
-                    console.log('Confirm CB fired!');
                     if(result){
-                        console.log('Confirm CB - Success');
+                        // Reduce the amount of the specified product
+                        cartProduct.deductSingleOptionSize(sizeId);
+
+                        // Add purchase data to the story
+                        dispatch({type: 'SAVE_ORDER_INFO', payload: new Order(
+                            categoryId,
+                            productId,
+                            sizeId,
+                            advancedOptions,
+                            totalAmount,
+                            'CARD',
+                        )});
+
                         nextSuccess();
                     }
                     else {
-                        console.log('Confirm CB - Success');
                         nextFailure(reason);
                     }
                 }, 
                 () => {
-                    console.log('Cancel CB fired!');
                     prev();
                 });
 

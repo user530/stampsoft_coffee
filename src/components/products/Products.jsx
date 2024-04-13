@@ -24,7 +24,7 @@ export const Products = (props) => {
     // Clear the cart and return to the promo screen on long idle
     const timeoutCb = React.useCallback(
         () => { 
-            dispatch({type: 'SET_CART', payload: null});
+            dispatch({type: 'SET_CART', payload: {}});
             prev();
         },
         []

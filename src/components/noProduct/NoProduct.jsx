@@ -2,11 +2,16 @@ import React from 'react';
 import styles from './NoProduct.module.scss';
 import { FullscreenBlock } from '../fullscreenBlock/FullscreenBlock';
 import sprite from '../../static/sprite.svg';
+import { useAppContext } from '../../hooks/context/AppContext';
 
 export const NoProduct = (props) => {
     const { backCb } = props;
 
+    const { dispatch } = useAppContext();
+
     const cancelClickHandler = () => {
+        // Clear product selection
+        dispatch({type: 'SET_CART', payload: {}});
         backCb();
     }
     

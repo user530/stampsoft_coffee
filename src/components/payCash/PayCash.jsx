@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './PayCash.module.scss';
 import { FaRegMoneyBillAlt } from "react-icons/fa";
 import { useAppContext } from '../../hooks/context/AppContext';
+import { Order } from '../../common/classes';
 
 export const PayCash = (props) => {
     const { next, prev } = props;
@@ -10,11 +11,14 @@ export const PayCash = (props) => {
     const nextSuccess = next(true);
     const nextFailure = next(false);
     
-    const { state: { emulator, cart } } = useAppContext();
+    const { state: { emulator, cart, storage }, dispatch } = useAppContext();
     
     const { CashPurchase, EmitCashin, StopCashin, EmitConfirm, EmitCancel } = emulator;
-    const { totalAmount } = cart;
-    
+    const { product, advancedOptions, totalAmount } = cart;
+
+    const { categoryId, productId, sizeId } = product;
+    const cartProduct = storage.getProductByCategoryId(categoryId, productId);
+
     const [sumInputed, setSumInputed] = React.useState(0);
 
     /**
@@ -55,6 +59,19 @@ export const PayCash = (props) => {
                     if(result) {
                         // Clear sumInputed
                         setSumInputed(0);
+
+                        // Reduce the amount of the specified product
+                        cartProduct.deductSingleOptionSize(sizeId);
+
+                        // Add purchase data to the story
+                        dispatch({type: 'SAVE_ORDER_INFO', payload: new Order(
+                            categoryId,
+                            productId,
+                            sizeId,
+                            advancedOptions,
+                            totalAmount,
+                            'CASH',
+                        )});
                         
                         nextSuccess();
                     }

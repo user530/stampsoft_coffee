@@ -25,6 +25,7 @@ function App() {
   const toBrewing = React.useCallback(() => setAppState('brewing'), []);
   const toSuccess = React.useCallback(() => setAppState('success'), []);
   const toFail = React.useCallback((reason) => {setAppState('fail'); setFailureReason(reason);}, []);
+  const toFailedVend = React.useCallback(() => setAppState('noproduct'), []);
   
   return (
     <main className={styles['app-wrapper']}>
@@ -35,7 +36,8 @@ function App() {
 
       {
         appState === 'products' 
-        && <Products next={toPayment} prev={toPromo} />
+        && <Products next={(result) => result ? () => toPayment() : () => toFailedVend()} prev={toPromo} />
+        // && <Products next={toPayment} prev={toPromo} />
       }
 
       {
@@ -70,12 +72,12 @@ function App() {
 
       {
         appState === 'ready'
-        && <DrinkReady nextCb={() => {console.log('Product ready!'); setAppState('promo');}} delay={5000} />
+        && <DrinkReady nextCb={() => {console.log('Product ready!'); toPromo();}} delay={5000} />
       }
 
       {
         appState === 'noproduct'
-        && <NoProduct backCb={() => {console.log('Product ready!'); setAppState('promo');}} delay={5000} />
+        && <NoProduct backCb={() => {console.log('No product!'); toProducts();}} delay={5000} />
       }
 
     </main>
