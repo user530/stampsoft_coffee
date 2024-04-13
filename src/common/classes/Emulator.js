@@ -1,7 +1,7 @@
 export class Emulator {
     status = 'READY';
     callbacks = {};
-    events = ['cashIn', 'cardIn', 'confirmPayment', 'cancelPayment', 'paymentStatusUpdated'];
+    events = ['cashIn', 'cardIn', 'confirmPayment', 'cancelPayment', 'paymentStatusUpdated', 'vendProduct'];
     stash = 0;
     cardInserted = false;
     interupted = false;
@@ -27,10 +27,6 @@ export class Emulator {
 
     setStatusReady = () => {
         this.status = 'READY';
-    }
-
-    setStatusWaitingProductSelect = () => {
-        this.status = 'WAITING_PRODUCT_SELECT';
     }
 
     setStatusWaitingProductVend = () => {
@@ -80,7 +76,7 @@ export class Emulator {
     /**
      * Register callback for a specified event
      * @param {string} eventName Name of the event to listen to
-     * @param {Function} cb Callback to fire each time event fires
+     * @param {(...args: any[]) => void} cb Callback to fire each time event emitted
      */
     registerCallback = (eventName, cb) => {
         if(typeof eventName !== 'string' 
@@ -104,7 +100,7 @@ export class Emulator {
     
     /**
      * Start listening to the 'cashIn' events and fire callback with a value of the inputed bill
-     * @param {Function} cb Callback to fire each time event fires
+     * @param {(amount: number) => void} cb Callback to fire each time 'cashIn' event is emitted, providing inserted bill value as argument
      */
     StartCashin = (cb) => {
         /* Skip, if emulator is already busy with some other task  */ 
@@ -112,7 +108,7 @@ export class Emulator {
             return;
         
         // Register callback
-        this.registerCallback('cashIn', (cashinEvent) => cb(cashinEvent.amount))
+        this.registerCallback('cashIn', (amount) => cb(amount))
         // Update the status
         this.setStatusWaitingCash();
     }
@@ -125,24 +121,21 @@ export class Emulator {
         // Skip, if emulator currently not listening to the 'cashIn' events
         if(this.status !== 'WAITING_CASH')
             return;
-
+        console.log('cash in fired', cashAmount);
         // Check argument 
         if( !cashAmount || typeof cashAmount !== 'number' || isNaN(cashAmount)) 
             return console.error('Provide valid cash amount!');
 
-        // Placeholder cashin event, later change to a creator method
-        const cashinEvent = { name: 'cashIn', amount: cashAmount };
-
         // Add to stash
         this.incrementStash(cashAmount);
-
+        
         // Fire a callback for the event
-        this.callbacks[cashinEvent.name](cashinEvent);
+        this.callbacks['cashIn'](cashAmount);
     }
 
     /**
      * Stops listening to the 'cashIn' events, clears callback and fires callback at the end
-     * @param {Function} cb Callback to fire at the end of
+     * @param {() => void} cb Callback to fire when vending stops taking in cash
      */
     StopCashin = (cb) => {
         // Skip, if emulator currently not listening to the 'cashIn' events
@@ -154,6 +147,12 @@ export class Emulator {
         cb();
     }
 
+    /**
+     * Initiate cash purchase operation: set listeners and wait for the cashIn, cofirm and cancel events
+     * @param {(amount: number) => void} cashInCb Callback that fires each time user inputs a bill. Takes number 'amount' as argument
+     * @param {(result: boolean) => void} confirmCb Callback that fires when user confirms cash purchase. Takes in bollean 'result' as argument
+     * @param {(reason: string) => void} cancelCb Callback that fires when user cancels cash purchase. Takes in string 'reason' as argument
+     */
     CashPurchase = (cashInCb, confirmCb, cancelCb) => {
         /* Skip, if emulator is already busy with some other task  */ 
         if(this.status !== 'READY') 
@@ -165,9 +164,11 @@ export class Emulator {
         this.StartCashin(cashInCb);
     }
 
-    EmitConfirm = async (confirmData) => {
-        console.log('Emit confirm fired');
-    
+    /**
+     * Emit 'Payment confirm' type of event
+     * @param {{type: string, change?: number, pincode?: number, interupt?: boolean}} confirmData Object that specifies confirmation data (amount of change to return/pincode to check or interupt flag to cancel ongoing async operation)
+     */
+    EmitConfirm = async (confirmData = {}) => {
         // Skip, if emulator currently not listening to the 'confirm' events
         if(this.status !== 'WAITING_CONFIRM')
             return;
@@ -179,13 +180,9 @@ export class Emulator {
 
         // If confirming cash payment -> return change
         if( type === 'cash'){
-            console.log('Cash payment');
-
             // Return the user change (if any) and clear the stash
             if(change) this.returnChange(change);
             this.clearStash();
-
-            console.log(this.status);
 
             // Fire a callback for the event, there is no 'failed' confirm so pass true
             this.callbacks['confirmPayment'](true);
@@ -232,9 +229,10 @@ export class Emulator {
         this.clearEventCallbacks('cancelPayment');
     }
 
+    /**
+     * Emit 'Payment cancel' type of event to abort ongoing operation
+     */
     EmitCancel = () => {
-        console.log('Emit cancel fired!');
-
         // Skip, if emulator currently not listening to cancelable events
         if(
             this.status !== 'WAITING_CONFIRM' 
@@ -248,13 +246,8 @@ export class Emulator {
         if(this.status === 'PROCESSING_CARD')
             return this.interuptOperation();
         
-        console.log('Correct status');
-
         // Return to idle status
         this.setStatusReady();
-
-        console.log('Reset status');
-        console.log(this.status);
 
         // Fire a callback for the event
         this.callbacks['cancelPayment']('Oперация отменена пользователем!');
@@ -281,10 +274,16 @@ export class Emulator {
 
         // Clear payment data
         this.chargedAmount = 0;
-        
-        console.log(this);
     }
 
+    /**
+     * Initiate card purchase operation: set listeners and wait for the cardIn events
+     * @param {number} amount Amount to charge for the purchase
+     * @param {(success: boolean, reason?: string) => void} cb Callback that fires when 'cardIn' event emitted. Reason is provided for failed purchase request
+     * @param {(status: string) => void} display_cb Callback that fires when purchase status changes
+     * @param {(success: boolean, result?: string) => void} confirmCb Callback that fires when 'confirmPayment' event emitted
+     * @param {(reason: string) => void} cancelCb Callback that fires when 'cancelPayment' event emitted
+     */
     BankCardPurchase = (amount, cb, display_cb, confirmCb, cancelCb) => {
         /* Skip, if emulator is already busy with some other task  */ 
         if(this.status !== 'READY') 
@@ -303,6 +302,9 @@ export class Emulator {
         this.registerCallback('cancelPayment', (reason) => cancelCb(reason));
     }
 
+    /**
+     * Function that holds card wrap-up logic (status change, clean charged amount, eject card, etc)
+     */
     BankCardCancel = () => {
         // Clean up logic
         this.ejectCard();
@@ -320,8 +322,11 @@ export class Emulator {
         this.clearEventCallbacks('cancelPayment');
     }
 
+    /**
+     * Emit 'cardIn' event and provides card data for the purchase operation
+     * @param {{data1: unknown, data2: unknown, data3: unknown, data4: unknown}} cardData Placeholder object that represents card data
+     */
     EmitCardIn = async (cardData) => {
-        console.log('Emit cardIn fired');
         /* Skip, if emulator is already busy with some other task  */ 
         if(this.status !== 'WAITING_CARD') 
             return;
@@ -364,7 +369,7 @@ export class Emulator {
             if(!check4) throw new Error('Недостаточно средств на карте!');
 
             this.EmitStatusUpdate('Подтвердите транзакцию');
-            console.log(this.interupted);
+            
             // If interuption flag was raised
             if(this.interupted) throw new Error('Операция отменена пользователем!');
             
@@ -372,8 +377,6 @@ export class Emulator {
 
             // Fire a callback for the event
             this.callbacks['cardIn'](true);
-
-            console.log(this);
 
         } catch (error) {
             this.setStatusReady();
@@ -385,6 +388,10 @@ export class Emulator {
         }
     }
 
+    /**
+     * Emits 'paymentStatusUpdated' event and provides a new status of the ongoing operation
+     * @param {string} newStatus New status string
+     */
     EmitStatusUpdate = (newStatus) => {
         if(this.status !== 'PROCESSING_CARD') return;
 
@@ -394,22 +401,53 @@ export class Emulator {
         this.callbacks['paymentStatusUpdated'](newStatus);
     }
 
-    Vending = (cb) => {
+    /**
+     * Initiate product purchase operation: set listener and wait for the 'vendProduct' event
+     * @param {(result: boolean) => void} cb Callback that will be fired when 'vendProduct' event emitted
+     */
+    StartVending = (cb) => {
         /* Skip, if emulator is already busy with some other task  */ 
         if(this.status !== 'READY') 
             return;
         
-        this.registerCallback('selectProduct', (product_idx) => this.setSelection(product_idx));
-        this.registerCallback('vendProduct', (product_idx) => cb(product_idx));
+        // Set status
+        this.setStatusWaitingProductVend();
 
-        // this.Se
-    // Выдача кофе с индексом product_idx (индексы в порядке, в котором они идут на
-    // первом экране)
-    // Активация успешной или неуспешной выдачи должна производится по нажатию
-    // комбинаций клавиш - на ваше усмотрение
-    // При успешной / неуспешной транзакции выполняется cb (result), где result - результат
-    // операции (true/false)
-}
+        // Register callbacks
+        this.registerCallback('vendProduct', (result) => cb(result));
+    }
+
+    /**
+     * Helper function to clean up after vending request is done
+     */
+    StopVending = () => {
+        // Return to idle status
+        this.setStatusReady();
+
+        // Clear callbacks
+        this.clearEventCallbacks('vendProduct');
+    }
+
+    /**
+     * Emulate some vending logic by checking the vending stock
+     * @param {{product: Product, sizeId: number}} purchaseData Purchase data consisting of the product object and size identifier to narrow options
+     */
+    EmitVendProduct = (purchaseData) => {
+        try {
+            if(this.status !== 'WAITING_PRODUCT_VEND') return;
+            
+            const { product, sizeId } = purchaseData;
+
+            if(!product || !sizeId) return;
+            
+            const isEnough = this.productAvailable(product, sizeId);
+            
+            this.callbacks['vendProduct'](isEnough);
+        } catch (error) {
+            console.error(error);
+            return;
+        }
+    }
 
     /**
      * Placeholder emulating the return of change
@@ -434,9 +472,29 @@ export class Emulator {
      * @returns {Promise<boolean>} Promise of the emulated result 
      */
     emulateCheck = async (isValid, timer = 2000) => new Promise(
-            (resolve) => setTimeout(
-                () => resolve(isValid),
-                timer + Math.random() * 1000
-            )
-        );
+        (resolve) => setTimeout(
+            () => resolve(isValid),
+            timer + Math.random() * 1000
+        )
+    );
+
+    /**
+     * Placeholder function to emulate some sort of vending check
+     * @param {Product} product Product instance representing required item
+     * @param {number} sizeId Product size option identifier
+     * @returns {boolean} True if product + size is in the stock
+     */
+    productAvailable = (product, sizeId) => {
+        try {
+            const { quantity, sizes } = product;
+
+            // Find requested option
+            const optionPair = sizes.find(optionPair => optionPair[0].optionId === sizeId);
+            
+            // Check if there is enough of product in stock and return a boolean
+            return quantity >= optionPair[0].optionModifier;
+        } catch (error) {
+            return false;
+        }
+    }
 }
