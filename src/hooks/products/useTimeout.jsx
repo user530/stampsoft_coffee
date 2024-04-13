@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const useTimeout = (timeoutCb, timeout=5000) => {
+export const useTimeout = (timeoutCb, timeout=10000) => {
     // Timeout to return back to the Promo screen if user is idle for a time
     const timeoutRef = React.useRef(null);
 
@@ -11,7 +11,7 @@ export const useTimeout = (timeoutCb, timeout=5000) => {
         timeoutRef.current = setTimeout(timeoutCb, timeout);
     }
 
-    const handleUserActivity = (e) => {console.log('User activity',e);resetTimeout()};
+    const handleUserActivity = () => {resetTimeout()};
 
     React.useEffect(
         () => {

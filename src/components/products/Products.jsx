@@ -11,11 +11,15 @@ import { useAppContext } from '../../hooks/context/AppContext';
 
 export const Products = (props) => {
     const { next, prev } = props;
+
+    const nextSuccess = next(true);
+    const nextFailure = next(false);
     
     const { state, dispatch } = useAppContext();
-    const { storage, cart } = state;
+    const { storage, cart, emulator } = state;
+    const { StartVending, StopVending, EmitVendProduct} = emulator;
 
-    console.log(cart);
+    console.log(state);
 
     // Clear the cart and return to the promo screen on long idle
     const timeoutCb = React.useCallback(
@@ -30,10 +34,15 @@ export const Products = (props) => {
 
     const clickHandler = React.useCallback(
         () => {
-            console.log('Clicked Products!');
-            next()
+            const { product: { categoryId, productId, sizeId } = {} } = cart;
+            const selectedProductObj = storage.getProductByCategoryId(categoryId, productId);
+            
+            EmitVendProduct({
+                product: selectedProductObj,
+                sizeId
+            });
         },
-        []
+        [storage, cart]
     );
     
     const {
@@ -82,6 +91,26 @@ export const Products = (props) => {
         // Update cart data
         dispatch({type: 'SET_CART', payload: newSelection});
     };
+
+    React.useEffect(
+        () => {
+            // Start vending listener on mount
+            StartVending(
+                (result) => {
+                    if(result)
+                        nextSuccess();
+                    else
+                        nextFailure();
+                }
+            );
+
+            return () => {
+                // Disable vending listener on dismount
+                StopVending();
+            }
+        },
+        []
+    )
 
     return (
         <section className={`${styles['wrapper']} ${styles['theme-' + selectedCategory.id]}`}>

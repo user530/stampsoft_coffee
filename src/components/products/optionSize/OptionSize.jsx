@@ -11,8 +11,7 @@ export const OptionSize = (props) => {
         cart: { product: { categoryId, productId, sizeId } } 
     } = state;
     
-    const selectedCategory = storage.getCategoryById(categoryId);
-    const { img, name, sizes } = selectedCategory.getProductById(productId);
+    const { img, name, sizes } = storage.getProductByCategoryId(categoryId, productId);
     
     const optionsMetadata = sizes.map(sizePricePair => sizePricePair[0]);
 
