@@ -12,32 +12,6 @@ export class Storage {
         this.advOptions = advOptions;
     }
 
-    // /**
-    //  * Try to find the price of the product with specified identifiers
-    //  * @param {number} categoryId Category identifier
-    //  * @param {number} productId Product identifier
-    //  * @param {number} optionId Option identifier
-    //  * @returns Price value for the specified product
-    //  */
-    // priceBySelection = (categoryId, productId, optionId) => {
-    //     const selectedCategory = this.categories.find(category => category.id === categoryId);
-
-    //     if(!selectedCategory || !selectedCategory.products)
-    //         return NaN;
-        
-    //     const selectedProduct = selectedCategory.products.find(product => product.id === productId);
-
-    //     if(!selectedProduct || !selectedProduct.sizes)
-    //         return NaN;
-
-    //     const selectedOption = selectedProduct.sizes.find(([optionMetadata]) => optionMetadata.optionId === optionId);
-
-    //     if(!selectedOption || !selectedOption[1])
-    //         return NaN;
-
-    //     return (!selectedOption || !selectedOption[1] ) ? NaN : selectedOption[1];
-    // }
-
     generateCart = (categoryId, productId, sizeId, advancedOptionsSlice) => {
         if(!categoryId || !productId || !sizeId) return null;
         
@@ -81,5 +55,10 @@ export class Storage {
 
     getCategoryById = (categoryId) => {
         return this.categories.find(category => category.id === categoryId);
+    }
+
+    getProductByCategoryId = (categoryId, productId) => {
+        const category = this.getCategoryById(categoryId);
+        return category ? category.getProductById(productId) : undefined;
     }
 }

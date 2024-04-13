@@ -5,6 +5,7 @@ const MetaSizeSmall = {
     optionName: '200 мл.',
     optionImg: `${sprite}#cup_symbol`,
     optionImgHeight: 119,
+    optionModifier: 1,
 }
 
 const MetaSizeMedium = {
@@ -12,6 +13,7 @@ const MetaSizeMedium = {
     optionName: '300 мл.',
     optionImg: `${sprite}#cup_symbol`,
     optionImgHeight: 143,
+    optionModifier: 1.5,
 }
 
 const MetaSizeBig = {
@@ -19,6 +21,7 @@ const MetaSizeBig = {
     optionName: '400 мл.',
     optionImg: `${sprite}#cup_symbol`,
     optionImgHeight: 174,
+    optionModifier: 2,
 };
 
 export class Product {
@@ -38,7 +41,7 @@ export class Product {
         productPriceSmall,
         productPriceMedium,
         productPriceBig,
-        productQuantity = 100,
+        productQuantity = parseInt(Math.random() * 10),
         ){
             this.id = productId;
             this.name = productName;
@@ -53,5 +56,15 @@ export class Product {
     
     getOptionDataById = (sizeId) => {
         return this.sizes.find(optionPair => optionPair[0].optionId === sizeId);
+    }
+
+    /**
+     * Reduce product quantity by the quantity of the specified size option
+     * @param {number} sizeId Size option identifier to use as a quantity base
+     */ 
+    deductSingleOptionSize = (sizeId) => {
+        const option = this.getOptionDataById(sizeId);
+        if(!option) return;
+        this.quantity = Math.max(0, this.quantity - option[0].optionModifier);
     }
 }
