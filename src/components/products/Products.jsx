@@ -8,6 +8,7 @@ import { Popup } from './popup/Popup';
 import { OptionSize } from './optionSize/OptionSize';
 import { OptionAdvanced } from './optionAdvanced/OptionAdvanced';
 import { useAppContext } from '../../hooks/context/AppContext';
+import { useStoredSelection } from '../../hooks/contextHooks/useStoredSelection';
 
 export const Products = (props) => {
     const { next, prev } = props;
@@ -19,9 +20,12 @@ export const Products = (props) => {
     const { storage, cart, emulator } = state;
     const { StartVending, StopVending, EmitVendProduct} = emulator;
 
-    // Clear the cart and return to the promo screen on long idle
+    const selectedProduct = useStoredSelection();
+    
+    // Return to the promo screen on long idle
     const timeoutCb = React.useCallback(
-        () => { 
+        () => {
+            // Clean up the cart
             dispatch({type: 'SET_CART', payload: {}});
             prev();
         },
@@ -29,10 +33,12 @@ export const Products = (props) => {
     );
     // Activate idle handler
     useTimeout(timeoutCb);
-
+    
     const clickHandler = React.useCallback(
         () => {
-            const { product: { categoryId, productId, sizeId } = {} } = cart;
+            if(!selectedProduct) return;
+
+            const { categoryId, productId, sizeId } = selectedProduct;
             const selectedProductObj = storage.getProductByCategoryId(categoryId, productId);
             
             EmitVendProduct({
@@ -169,10 +175,10 @@ export const Products = (props) => {
             </div>
             
             {
-                (cart?.product?.productId) &&
+                // (cart?.product?.productId) &&
                 <Popup 
                 key={1} 
-                price={cart.totalAmount}
+                price={cart ? cart.totalAmount : 0}
                 isOpen={sizePopupOpen} 
                 closeCb={closeSizePopup} 
                 nextCb={clickHandler}

@@ -4,7 +4,6 @@ import { PayCard } from './components/payCard/PayCard';
 import { PayCash } from './components/payCash/PayCash';
 import { Products } from './components/products/Products';
 import { Promo } from './components/promo/Promo';
-import { storage } from './data/data';
 import { SelectPayment } from './components/selectPayment/SelectPayment';
 import { PaymentFail } from './components/paymentFail/PaymentFail';
 import { Brewing } from './components/brewing/Brewing';
@@ -14,7 +13,6 @@ import { NoProduct } from './components/noProduct/NoProduct';
 
 function App() {
   const [appState, setAppState] = React.useState('promo');
-  const [cartItem, setCartItem] = React.useState(null);
   const [failureReason, setFailureReason] = React.useState('');
   
   const toPromo = React.useCallback(() => setAppState('promo'), []);
@@ -26,58 +24,58 @@ function App() {
   const toSuccess = React.useCallback(() => setAppState('success'), []);
   const toFail = React.useCallback((reason) => {setAppState('fail'); setFailureReason(reason);}, []);
   const toFailedVend = React.useCallback(() => setAppState('noproduct'), []);
+  const toProductReady = React.useCallback(() => setAppState('ready'), [])
   
   return (
     <main className={styles['app-wrapper']}>
       { 
         appState === 'promo' 
-        && <Promo headingTxt={'Это твой кофе'} btnText={'Коснитесь экрана'} next={toProducts} />
+        && <Promo headingTxt={ 'Это твой кофе' } btnText={ 'Коснитесь экрана' } next={ toProducts } />
       }
 
       {
         appState === 'products' 
-        && <Products next={(result) => result ? () => toPayment() : () => toFailedVend()} prev={toPromo} />
-        // && <Products next={toPayment} prev={toPromo} />
+        && <Products next={ (result) => result ? toPayment : toFailedVend } prev={ toPromo } />
       }
 
       {
         appState === 'selectPayment'
-        && <SelectPayment prev={toProducts} nextCash={toPayCash} nextCard={toPayCard} />
+        && <SelectPayment prev={ toProducts } nextCash={ toPayCash } nextCard={ toPayCard } />
       }
 
       {
         appState === 'payCard' 
-        && <PayCard next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} />
+        && <PayCard next={ (result) => result ? toSuccess : (reason) => toFail(reason) } prev={ toPayment } />
       }
 
       {
         appState === 'payCash' 
-        && <PayCash next={ (result) => result ? () => toSuccess() : (reason) => toFail(reason) } prev={toPayment} />
+        && <PayCash next={ (result) => result ? toSuccess : (reason) => toFail(reason) } prev={ toPayment } />
       }
 
       {
         appState === 'fail'
-        && <PaymentFail cancelCb={ () => {toProducts(); setFailureReason('');} } retryCb={ toPayCard } failReason={ failureReason }/>
+        && <PaymentFail cancelCb={ () => { toProducts(); setFailureReason(''); } } retryCb={ toPayCard } failReason={ failureReason }/>
       }
 
       {
         appState === 'success'
-        && <PaymentSuccess nextCb={() => {console.log('Payment success!'); setAppState('brewing');}} delay={3000}/>
+        && <PaymentSuccess nextCb={ toBrewing } delay={ 3000 }/>
       }
 
       {
         appState === 'brewing'
-        && <Brewing nextCb={() => {console.log('Brewing completed!'); setAppState('ready');}}/>
+        && <Brewing nextCb={ toProductReady }/>
       }
 
       {
         appState === 'ready'
-        && <DrinkReady nextCb={() => {console.log('Product ready!'); toPromo();}} delay={5000} />
+        && <DrinkReady nextCb={ toPromo } delay={ 3000 } />
       }
 
       {
         appState === 'noproduct'
-        && <NoProduct backCb={() => {console.log('No product!'); toProducts();}} delay={5000} />
+        && <NoProduct backCb={ toProducts } delay={ 3000 } />
       }
 
     </main>

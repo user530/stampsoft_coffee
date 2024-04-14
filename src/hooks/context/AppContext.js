@@ -13,7 +13,6 @@ const initialState = {
 const AppContext = React.createContext();
 
 export const AppProvider = ({ children }) => {
-
     const rootReducer = combineReducers({
         emulator: emulatorReducer,
         storage: storageReducer,        

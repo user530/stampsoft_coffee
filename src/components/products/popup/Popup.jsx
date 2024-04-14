@@ -8,6 +8,7 @@ export const Popup = (props) => {
         <section 
         className={`${styles['overlay']} ${isOpen ? styles['active']: ''}`}
         >
+            <div className={styles['popup__bg']}></div>
             <div className={styles['popup']}>
                 <button 
                 className={styles['popup__close']}
@@ -23,7 +24,7 @@ export const Popup = (props) => {
                 onClick={nextCb}
                 >
                     <p>Оплатить</p>
-                    <p className={styles['accent']}>{ price }&#8381;</p>
+                    <p className={styles['accent']}>{ price ?? ''}&#8381;</p>
                 </button>
             </div>
         </section>

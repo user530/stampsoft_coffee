@@ -1,19 +1,24 @@
 import React from 'react';
 import styles from './OptionSize.module.scss';
 import { useAppContext } from '../../../hooks/context/AppContext';
+import { useStoredSelection } from '../../../hooks/contextHooks/useStoredSelection';
 
 export const OptionSize = (props) => {
     const { sizeClickCb, advClickCb } = props;
 
     const { state } = useAppContext();
-    const { 
-        storage, 
-        cart: { product: { categoryId, productId, sizeId } } 
-    } = state;
     
-    const { img, name, sizes } = storage.getProductByCategoryId(categoryId, productId);
+    const { storage } = state;
     
-    const optionsMetadata = sizes.map(sizePricePair => sizePricePair[0]);
+    const product = useStoredSelection();
+
+    const sizeId = product ? product.sizeId : 0;
+    
+    const { img, name, sizes } = product 
+    ? storage.getProductByCategoryId(product.categoryId, product.productId) 
+    : {};
+
+    const optionsMetadata = sizes ? sizes.map(sizePricePair => sizePricePair[0]) : [];
 
     return ( 
         <div className={styles['wrapper']}>  

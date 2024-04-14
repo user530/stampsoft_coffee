@@ -10,7 +10,7 @@ export const NoProduct = (props) => {
     const { dispatch } = useAppContext();
 
     const cancelClickHandler = () => {
-        // Clear product selection
+        // Clean up the cart
         dispatch({type: 'SET_CART', payload: {}});
         backCb();
     }
