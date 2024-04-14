@@ -2,6 +2,8 @@
 @import '../../../common/styles/typography/typography.scss';
 
 .product-card {
+    font-family: 'Mont-Regular';
+    position: relative;
     display: flex;
     flex-direction: column;
     border-radius: 35px;

@@ -1,7 +1,7 @@
 @use '../../../common/styles/colors/colors.scss' as colors;
 @import '../../../common/styles/typography/typography.scss';
 
-$active-marker: url('../../../static/active_marker.png');
+$active-marker: url('../../../static/active_marker.webp');
 
 .category-item {
     flex-shrink: 0;

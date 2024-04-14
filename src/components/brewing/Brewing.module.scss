@@ -3,7 +3,7 @@
 
 .wrapper {
     width: 100%;
-    height: 100%;
+    height: 1920px;
     background-color: colors.$white;
     padding: 91px;
     display: flex;
@@ -80,7 +80,7 @@ svg.progress__circle {
 
 .progress__display {
     position: absolute;
-    top: 50%;
+    top: 48%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
@@ -93,6 +93,11 @@ svg.progress__circle {
 }
 
 .status {
+    position: absolute;
+    width: 100%;
+    top: 105%;
+    left: 50%;
+    transform: translateX(-50%);
     font-weight: 600;
     font-size: 40px;
     line-height: 141%;

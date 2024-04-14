@@ -49,6 +49,10 @@
     color: #A0A0A0;
     background-color: colors.$lightGrey;
 
+    &:hover {
+        outline: 1px solid black;
+    }
+
     &.active {
         color: colors.$black;
         background-color: colors.$yellow;
