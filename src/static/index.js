@@ -1,9 +1,10 @@
-import bean1 from './bean1.png';
-import bean2 from './bean2.png';
-import bean3 from './bean3.png';
-import bean4 from './bean4.png';
-import bean5 from './bean5.png';
-import cup from './cup.png';
+import bean1 from './bean1.webp';
+import bean2 from './bean2.webp';
+import bean3 from './bean3.webp';
+import bean4 from './bean4.webp';
+import bean5 from './bean5.webp';
+import cup from './cup.webp';
+import marker from './active_marker.webp';
 
 export {
     bean1, 
@@ -12,4 +13,5 @@ export {
     bean4,
     bean5,
     cup,
+    marker
 }
