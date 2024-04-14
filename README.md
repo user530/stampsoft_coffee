@@ -1,5 +1,5 @@
 [![en](https://img.shields.io/badge/Language-EN-blue.svg)](https://github.com/user530/stampsoft_coffee/blob/master/README.md)
-[![ru](https://img.shields.io/badge/Language-RU-red.svg)](https://github.com/user530/stampsoft_coffee/blob/master/README.md)
+[![ru](https://img.shields.io/badge/Language-RU-red.svg)](https://github.com/user530/stampsoft_coffee/blob/master/README.ru.md)
 
 # VENDING EMULATOR (Prototype)
 ### Test Assignment for Stampsoft
