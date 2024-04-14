@@ -99,16 +99,35 @@
 
 .products__content-wrapper {
     margin-top: 62px;
+    margin-right: -12px; // Stretch to the right for the scroll bar
     height: 1007px;
     overflow: hidden;
     overflow-y: auto;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+        display: block;
+        width: 5px;
+    };
+
+    &::-webkit-scrollbar-track {
+        width: 5px;
+        background-color: #F3F3F3;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        width: 5px;
+        background-color: colors.$yellow;
+        border-radius: 5px;
+    }
 }
 
 .products__content {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+    margin-right: 12px; // Compensate for the parent scrollbar stretch
+    width: 1040px;
     
     &::-webkit-scrollbar {
         display: none;
