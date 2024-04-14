@@ -11,6 +11,11 @@
     padding: 22px 17px 23px;
     color: colors.$black;
     text-align: center;
+    cursor: pointer;
+
+    &:hover, &:active {
+        box-shadow: 0 0 3px 1px black inset;
+    }
 
     & > * {
         width: 100%;

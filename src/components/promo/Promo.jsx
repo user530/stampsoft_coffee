@@ -5,7 +5,6 @@ export const Promo = (props) => {
     const { headingTxt, btnText, next } = props;
 
     const clickHandler = () => {
-        console.log('Clicked promo!');
         next();
     }
     

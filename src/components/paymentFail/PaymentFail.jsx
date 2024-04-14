@@ -6,12 +6,10 @@ export const PaymentFail = (props) => {
     const { cancelCb, retryCb, failReason } = props;
 
     const retryClickHandler = () => {
-        console.log('Clicked retry!');
         retryCb();
     }
 
     const cancelClickHandler = () => {
-        console.log('Clicked cancel!');
         cancelCb();
     }
 

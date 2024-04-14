@@ -121,14 +121,14 @@ export class Emulator {
         // Skip, if emulator currently not listening to the 'cashIn' events
         if(this.status !== 'WAITING_CASH')
             return;
-        console.log('cash in fired', cashAmount);
+        
         // Check argument 
         if( !cashAmount || typeof cashAmount !== 'number' || isNaN(cashAmount)) 
             return console.error('Provide valid cash amount!');
 
         // Add to stash
         this.incrementStash(cashAmount);
-        
+
         // Fire a callback for the event
         this.callbacks['cashIn'](cashAmount);
     }

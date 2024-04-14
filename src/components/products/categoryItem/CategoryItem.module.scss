@@ -13,6 +13,10 @@ $active-marker: url('../../../static/active_marker.webp');
     padding-bottom: calc(30px + 45px);
     cursor: pointer;
 
+    &:hover {
+        box-shadow: 0 0 3px 1px black inset;
+    }
+
     &.active {
         position: relative;
         background-color: colors.$disabledGrey;

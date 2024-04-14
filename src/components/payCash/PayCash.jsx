@@ -42,7 +42,7 @@ export const PayCash = (props) => {
     React.useEffect(
         () => {
             if(sumInputed >= totalAmount) {
-                StopCashin(() => {console.log('Cash In Stoped!')});
+                StopCashin(() => {});
             }
         },
         [sumInputed]

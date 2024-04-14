@@ -1,6 +1,11 @@
 import React from 'react';
 
-export const useTimeout = (timeoutCb, timeout=10000) => {
+/**
+ * Custom hook to call a specified callback if user doesn't interact with the component in specified time
+ * @param { Function } timeoutCb Callback that will be fired if specified time user doesn't do anything
+ * @param { number } timeoutSec Time in seconds to wait before firing the callback
+ */
+export const useTimeout = (timeoutCb, timeoutSec=10) => {
     // Timeout to return back to the Promo screen if user is idle for a time
     const timeoutRef = React.useRef(null);
 
@@ -8,10 +13,10 @@ export const useTimeout = (timeoutCb, timeout=10000) => {
         if(timeoutRef.current)
             clearTimeout(timeoutRef.current);
 
-        timeoutRef.current = setTimeout(timeoutCb, timeout);
+        timeoutRef.current = setTimeout(timeoutCb, timeoutSec * 1000);
     }
 
-    const handleUserActivity = () => {resetTimeout()};
+    const handleUserActivity = () => { resetTimeout() };
 
     React.useEffect(
         () => {

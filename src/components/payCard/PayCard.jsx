@@ -107,12 +107,15 @@ export const PayCard = (props) => {
     return (
         <section className={styles['wrapper']}>
             <div className={styles['content']}>
-                <div className={styles['content__img']}>
-                    <svg>
-                        <use href={`${sprite}#card_symbol`}/>
-                    </svg>
+                <div className={styles['content__block']}>
+                    <div className={styles['content__img']}>
+                        <svg>
+                            <use href={`${sprite}#card_symbol`}/>
+                        </svg>
+                    </div>
+                    <h3 className={styles['content__title']}>{statusText}</h3>
+
                 </div>
-                <h3 className={styles['content__title']}>{statusText}</h3>
             </div>
 
             <button onClick={cancelClickHandler}>Отмена</button>

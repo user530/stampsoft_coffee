@@ -4,6 +4,9 @@
 .content {
     --color: colors.$yellow;
     height: 1920px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .content__img {

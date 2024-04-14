@@ -62,7 +62,7 @@ export const Brewing = (props) => {
                 () => {
                     // Display next message
                     displayCb(brewingPlan[stepIndex + 1][0])
-                    console.log('Timeout Id - ', timeoutId);
+                    
                     // Call next step if needed
                     if(stepIndex < brewingPlan.length - 2)
                         timeoutId = displayPlanSteps(stepIndex + 1)

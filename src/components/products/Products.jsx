@@ -19,8 +19,6 @@ export const Products = (props) => {
     const { storage, cart, emulator } = state;
     const { StartVending, StopVending, EmitVendProduct} = emulator;
 
-    console.log(state);
-
     // Clear the cart and return to the promo screen on long idle
     const timeoutCb = React.useCallback(
         () => { 
