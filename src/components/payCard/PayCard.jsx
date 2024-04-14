@@ -120,7 +120,7 @@ export const PayCard = (props) => {
 
             <button onClick={cancelClickHandler}>Отмена</button>
 
-            <PinPad isActive={showPinpad} closeCb={closePinpad} sumbitCb={submitPin}/>
+            <PinPad isActive={showPinpad} hidePinpad={() => setShowPinpad(false)} closeCb={closePinpad} sumbitCb={submitPin}/>
         </section>
     )
 }

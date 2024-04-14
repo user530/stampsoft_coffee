@@ -5,9 +5,10 @@ import { TfiAngleDoubleLeft } from "react-icons/tfi";
 import { PinKey } from './pinKey/PinKey';
 
 export const PinPad = (props) => {
-    const { isActive, closeCb, sumbitCb } = props;
+    const { isActive, hidePinpad, closeCb, sumbitCb } = props;
 
     const [pincode, setPincode] = React.useState('');
+    const [awaitingResult, setAwaitingResult] = React.useState(false);
     
     const addNumber = React.useCallback(
         (number) => {
@@ -27,11 +28,14 @@ export const PinPad = (props) => {
     const closeBtnHandler = () => {
         setPincode('');
         closeCb();
+        setAwaitingResult(false);
     };
 
     const submitBtnHandler = () => {
         sumbitCb(pincode);
         setPincode('');
+        setAwaitingResult(true);
+        hidePinpad();
     }
 
     return (
@@ -39,6 +43,7 @@ export const PinPad = (props) => {
             <button 
                 className={styles['button-back']}
                 onClick={closeBtnHandler}
+                disabled={awaitingResult}
             >
                 <FaAngleLeft/>
             </button>
@@ -76,7 +81,7 @@ export const PinPad = (props) => {
 
             <button 
                 className={styles['button-submit']} 
-                disabled={ pincode.length !== 4 }
+                disabled={ pincode.length !== 4 || awaitingResult }
                 onClick={ submitBtnHandler }
             >
                 Отправить
